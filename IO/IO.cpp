@@ -6,12 +6,28 @@ struct monitor {
 	int floor; // which floor it is on; European convention
 };
 
+struct IODispatch {
+	int valCom; // command to move floor
+};
+
+void monitorDatapool();
+void dispatchPipeline();
+
 int main() {
 	int i;
 	for (i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from IO..." << endl;
 		Sleep(50);
 	}
+
+	monitorDatapool();
+	dispatchPipeline();
+
+	getchar();
+	return 0;
+}
+
+void monitorDatapool() {
 	CDataPool dp1("Monitor1", sizeof(struct monitor));
 	CDataPool dp2("Monitor2", sizeof(struct monitor));
 
@@ -20,7 +36,13 @@ int main() {
 
 	cout << "From IO, elevator 1 is on floor " << monitor1->floor << endl;
 	cout << "From IO, elevator 2 is on floor " << monitor2->floor << endl;
+}
 
-	getchar();
-	return 0;
+void dispatchPipeline() {
+	CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100);
+	IODispatch dispatch;
+	dispatch.valCom = 99; // change to receive user input later
+	PipeIODispatch.Write(&dispatch.valCom);
+	cout << "IO wrote " << dispatch.valCom << " to dispatch pipeline!" << endl;
+	cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
 }

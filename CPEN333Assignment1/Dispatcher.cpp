@@ -2,6 +2,7 @@
 
 void initializeProcesses();
 void initializeMonitors();
+void initializeTypedPipes();
 
 struct monitor {
 	int moveStatus; // 1 up, -1 down, 0 stationary
@@ -9,12 +10,18 @@ struct monitor {
 	int floor; // which floor it is on; European convention
 };
 
+struct IODispatch {
+	int valCom; // command to move floor
+};
+
 int main(void) {
 	cout << "Dispatcher running..." << endl;
 
 	initializeMonitors();
-
 	initializeProcesses();
+	initializeTypedPipes();
+
+
 
 	cout << "Dispatcher complete..." << endl;
 	return 0;
@@ -39,6 +46,17 @@ void initializeProcesses() {
 		OWN_WINDOW,
 		ACTIVE
 	);
+
+	// How to nest this in another function?
+	int pipeIOData;
+	CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100);
+	while (1) {
+		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
+			PipeIODispatch.Read(&pipeIOData);
+			cout << "Dispatcher read " << pipeIOData << " from IO..." << endl;
+			break;
+		}
+	}
 
 	cout << "Elevator 1, 2, and IO activated..." << endl;
 	cout << "Waiting for self-made child process 1 to terminate..." << endl;
@@ -65,5 +83,11 @@ void initializeMonitors() {
 	monitor2->moveStatus = 0;
 	monitor2->doorStatus = 0;
 
+	cout << "Elevator 1, elevator 2, and IO initialized..." << endl;
+
 	getchar();
+}
+
+void initializeTypedPipes() {
+
 }
