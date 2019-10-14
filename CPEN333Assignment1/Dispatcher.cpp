@@ -1,5 +1,6 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
 
+// How to sync process creation?
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 CRendezvous r2("TerminationRendezvous", 4); // sync deletion of 4x processes
 
@@ -22,6 +23,9 @@ int main(void) {
 
 	initializeMonitors();
 	initializeProcesses();
+
+	
+
 	initializeTypedPipes();
 
 	cout << "Dispatcher complete..." << endl;
