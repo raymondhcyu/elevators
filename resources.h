@@ -54,7 +54,7 @@ public:
 		theDataPool = new CDataPool(string("DataPool") + string(Name), sizeof(struct theData));
 		dataPtr = (struct theData*)(theDataPool->LinkDataPool());
 
-		// Where should these semaphores go?
+		// Where should these semaphores go???
 		CSemaphore ps1("PS1", 0, 1); // semaphore w/ init value 0; max 1
 		CSemaphore cs1("CS1", 1, 1); // sempahore w/ init value 1; max 1
 		CSemaphore ps2("PS2", 0, 1);
