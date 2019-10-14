@@ -12,31 +12,40 @@ private:
 	};
 
 	CDataPool* theDataPool;  // a datapool containing the data to be protected 
-	CMutex* theMutex;	       // a pointer to a hidden mutex protecting the data
 	theData* dataPtr;			// pointer to the data
+
+	CSemaphore* ps1;
+	CSemaphore* ps2;
+	CSemaphore* cs1;
+	CSemaphore* cs2;
 
 public:
 	void setFloor(int initFloor) {
-		theMutex->Wait();
+		cs1->Wait();
+		cs2->Wait();
 		dataPtr->floor = initFloor;
-		theMutex->Signal();
+		ps1->Signal();
+		ps2->Signal();
 	}
 
 	int getFloor(void) {
-		theMutex->Wait();
+		cs1->Wait();
+		cs2->Wait();
 		return dataPtr->floor;
-		theMutex->Signal();
+		ps1->Signal();
+		ps2->Signal();
 	}
 
 	void targetFloor(int desiredFloor) {
-		theMutex->Wait();
+		cs1->Wait();
+		cs2->Wait();
 		dataPtr->targetFloor = desiredFloor;
-		theMutex->Signal();
+		ps1->Signal();
+		ps2->Signal();
 	}
 
 	void updateStatus(void) {
 		// Move up
-		theMutex->Wait();
 		if (dataPtr->targetFloor > dataPtr->floor) {
 			cout << "Elevator moving up..." << endl;
 		}
@@ -45,20 +54,16 @@ public:
 			cout << "Elevator moving down..." << endl;
 		else
 			cout << "Elevator not moving..." << endl;
-		theMutex->Signal();
 	}
 
 	// Constructor with single producer and two consumers
 	TheMonitor (string Name) {
-		theMutex = new CMutex(string("Mutex") + string(Name));
+		ps1 = new CSemaphore("PS1", 0, 1);
+		ps2 = new CSemaphore("PS2", 0, 1);
+		cs1 = new CSemaphore("PS1", 1, 1);
+		cs2 = new CSemaphore("PS2", 1, 1);
 		theDataPool = new CDataPool(string("DataPool") + string(Name), sizeof(struct theData));
 		dataPtr = (struct theData*)(theDataPool->LinkDataPool());
-
-		// Where should these semaphores go???
-		CSemaphore ps1("PS1", 0, 1); // semaphore w/ init value 0; max 1
-		CSemaphore cs1("CS1", 1, 1); // sempahore w/ init value 1; max 1
-		CSemaphore ps2("PS2", 0, 1);
-		CSemaphore cs2("CS2", 1, 1);
 	}
 	~TheMonitor() {
 	}
