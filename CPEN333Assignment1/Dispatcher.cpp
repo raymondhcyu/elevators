@@ -21,8 +21,6 @@ int main(void) {
 	initializeProcesses();
 	initializeTypedPipes();
 
-
-
 	cout << "Dispatcher complete..." << endl;
 	return 0;
 }

@@ -127,6 +127,7 @@
     <ClCompile Include="Dispatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\resources.h" />
     <ClInclude Include="..\rt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

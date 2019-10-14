@@ -1,22 +1,23 @@
-#include "D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\rt.h"
+/*
+	Produces data using named monitor
+*/
 
-struct monitor {
-	int moveStatus; // 1 up, -1 down, 0 stationary
-	int doorStatus; // opening, closing, closed, open
-	int floor; // which floor it is on; European convention
-};
+#include "D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\rt.h"
+#include "..\\resources.h"
+
+TheMonitor elevatorOneMonitor("Elevator One Monitor");
 
 int main() {
+
+	elevatorOneMonitor.setFloor(0);
+
 	int i;
 	for (i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from elevator process 1..." << endl;
 		Sleep(50);
 	}
 
-	CDataPool dp1("Monitor1", sizeof(struct monitor));
-	struct monitor* monitor1 = (struct monitor*)(dp1.LinkDataPool());
-
-	cout << "Elevator 1 is on floor " << monitor1->floor << endl;
+	testFunction(elevatorOneMonitor);
 
 	getchar();
 	return 0;
