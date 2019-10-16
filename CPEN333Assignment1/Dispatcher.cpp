@@ -1,12 +1,10 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
 
-// How to sync process creation?
-CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
-CRendezvous r2("TerminationRendezvous", 4); // sync deletion of 4x processes
+CRendezvous r1("CreationRendezvous", 3); // sync creation of 4x processes
+CRendezvous r2("TerminationRendezvous", 3); // sync deletion of 4x processes
 
 void initializeProcesses();
 void initializeMonitors();
-void initializeTypedPipes();
 
 struct monitor {
 	int moveStatus; // 1 up, -1 down, 0 stationary
@@ -23,10 +21,6 @@ int main(void) {
 
 	initializeMonitors();
 	initializeProcesses();
-
-	
-
-	initializeTypedPipes();
 
 	cout << "Dispatcher complete..." << endl;
 	return 0;
@@ -45,7 +39,7 @@ void initializeProcesses() {
 		OWN_WINDOW,
 		ACTIVE
 	);
-	// Elevator 3 child process
+	// IO child process
 	CProcess p3("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\IO.exe",
 		NORMAL_PRIORITY_CLASS,
 		OWN_WINDOW,
@@ -89,10 +83,4 @@ void initializeMonitors() {
 	monitor2->doorStatus = 0;
 
 	cout << "Elevator 1, elevator 2, and IO initialized..." << endl;
-
-	getchar();
-}
-
-void initializeTypedPipes() {
-
 }
