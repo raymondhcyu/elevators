@@ -1,8 +1,5 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
 
-CRendezvous r1("CreationRendezvous", 3); // sync creation of 4x processes
-CRendezvous r2("TerminationRendezvous", 3); // sync deletion of 4x processes
-
 void initializeProcesses();
 void initializeMonitors();
 

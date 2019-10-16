@@ -14,9 +14,11 @@ int main() {
 	for (i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from elevator process 2..." << endl;
 		Sleep(50);
-		r1.Wait();
-		cout << "Elevator process 2 is done waiting" << endl;
 	}
+
+	Sleep(4000);
+	r1.Wait();
+	cout << "Elevator process 2 is done waiting" << endl;
 
 	CDataPool dp2("Monitor2", sizeof(struct monitor));
 	struct monitor* monitor2 = (struct monitor*)(dp2.LinkDataPool());

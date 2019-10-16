@@ -21,9 +21,11 @@ int main() {
 	for (i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from IO..." << endl;
 		Sleep(50);
-		r1.Wait();
-		cout << "IO is done waiting" << endl;
 	}
+
+	Sleep(3500);
+	r1.Wait();
+	cout << "IO is done waiting" << endl;
 
 	monitorDatapool();
 	dispatchPipeline();
