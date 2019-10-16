@@ -1,5 +1,7 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
 
+CRendezvous r1("CreationRendezvous", 3); // sync creation of IO and elevators
+
 void initializeProcesses();
 void initializeMonitors();
 
@@ -16,7 +18,7 @@ struct IODispatch {
 int main(void) {
 	cout << "Dispatcher running..." << endl;
 
-	initializeMonitors();
+	//initializeMonitors();
 	initializeProcesses();
 
 	cout << "Dispatcher complete..." << endl;

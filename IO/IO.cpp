@@ -1,7 +1,6 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
 
 CRendezvous r1("CreationRendezvous", 3); // sync creation of 4x processes
-CRendezvous r2("TerminationRendezvous", 3); // sync deletion of 4x processes
 
 struct monitor {
 	int moveStatus; // 1 up, -1 down, 0 stationary
@@ -17,15 +16,16 @@ void monitorDatapool();
 void dispatchPipeline();
 
 int main() {
+	// Rendezvous to start
+	Sleep(3500);
+	r1.Wait();
+	cout << "IO is done waiting" << endl;
+
 	int i;
 	for (i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from IO..." << endl;
 		Sleep(50);
 	}
-
-	Sleep(3500);
-	r1.Wait();
-	cout << "IO is done waiting" << endl;
 
 	monitorDatapool();
 	dispatchPipeline();
