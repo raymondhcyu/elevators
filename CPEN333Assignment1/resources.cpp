@@ -1,7 +1,9 @@
 #include "..\rt.h"
 #include "..\resources.h"
+#include <iostream>
+#include <string>
 
-TheMonitor::TheMonitor() {
+TheMonitorTwo::TheMonitorTwo() {
 	// Single producer (elevator) double consumer (dispatch and IO)
 	ps1 = new CSemaphore("PS1", 0, 1);
 	ps2 = new CSemaphore("PS2", 0, 1);
@@ -12,7 +14,7 @@ TheMonitor::TheMonitor() {
 }
 
 // Update floor (producer)
-void TheMonitor::setFloor(int initFloor) {
+void TheMonitorTwo::setFloor(int initFloor) {
 	cs1->Wait();
 	cs2->Wait();
 	dataPtr->floor = initFloor;
@@ -21,7 +23,7 @@ void TheMonitor::setFloor(int initFloor) {
 }
 
 // Get floor (child dispatcher)
-int TheMonitor::getFloorDispatch(void) {
+int TheMonitorTwo::getFloorDispatch(void) {
 	ps1->Wait();
 	int theFloor = dataPtr->floor; // can't return here else doesn't signal
 	cs1->Signal();
@@ -30,7 +32,7 @@ int TheMonitor::getFloorDispatch(void) {
 }
 
 // Get floor (child IO)
-int TheMonitor::getFloorIO(void) {
+int TheMonitorTwo::getFloorIO(void) {
 	ps2->Wait();
 	int theFloor = dataPtr->floor; // can't return here else doesn't signal
 	cs2->Signal();
@@ -38,4 +40,4 @@ int TheMonitor::getFloorIO(void) {
 	return theFloor;
 }
 
-TheMonitor::~TheMonitor() {}
+TheMonitorTwo::~TheMonitorTwo() {}

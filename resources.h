@@ -3,7 +3,7 @@
 
 #include "rt.h"
 
-class TheMonitor {
+class TheMonitorTwo {
 private:
 	struct theData {
 		int floor; // which floor it is on; European convention
@@ -18,11 +18,11 @@ private:
 	CSemaphore* cs2;
 
 public:
-	TheMonitor(); // default constructor; default floor 0
+	TheMonitorTwo(); // default constructor; default floor 0
 	void setFloor(int initFloor); // update floor
 	int getFloorIO(void); // floor currently on
 	int getFloorDispatch(void); // floor currently on
-	~TheMonitor();
+	~TheMonitorTwo();
 };
 
 #endif

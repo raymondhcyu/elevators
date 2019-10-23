@@ -1,7 +1,7 @@
 #include "..\rt.h"
 #include "..\resources.h"
 
-TheMonitor elevatorTwoMonitor;
+TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
@@ -12,7 +12,7 @@ void dispatchPipeline();
 
 int main() {
 	// Rendezvous to start
-	//r1.Wait();
+	r1.Wait();
 	cout << "IO is done waiting" << endl;
 
 	int i;

@@ -1,12 +1,12 @@
 #include "..\rt.h"
 #include "..\resources.h"
 
-TheMonitor elevatorTwoMonitor;
+TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 int main() {
 	// Rendezvous to start
-	//r1.Wait();
+	r1.Wait();
 	cout << "Elevator process 2 is done waiting" << endl;
 
 	int i;
