@@ -65,13 +65,7 @@ public:
 		theDataPool = new CDataPool(string("DataPool") + string(Name), sizeof(struct theData));
 		dataPtr = (struct theData*)(theDataPool->LinkDataPool());
 	}
-	~TheMonitor() {
-	}
+	~TheMonitor() {}
 };
-
-void testFunction(TheMonitor thisMonitor) {
-	cout << "Hello from the embedded test function!" << endl;
-	cout << "Elevator X is on floor " << thisMonitor.getFloor() << endl;
-}
 
 #endif

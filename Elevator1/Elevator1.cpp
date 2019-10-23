@@ -7,12 +7,9 @@
 
 TheMonitor elevatorOneMonitor("Elevator One Monitor");
 
-CRendezvous r1("CreationRendezvous", 3); // sync creation of 4x processes
+CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 int main() {
-
-	//elevatorOneMonitor.setFloor(0);
-
 	// Rendezvous to start
 	Sleep(5000);
 	r1.Wait();
@@ -23,8 +20,6 @@ int main() {
 		cout << "Helloo " << i << " from elevator process 1..." << endl;
 		Sleep(50);
 	}
-
-	//testFunction(elevatorOneMonitor);
 
 	getchar();
 	return 0;

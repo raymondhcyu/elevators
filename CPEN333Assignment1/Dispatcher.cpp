@@ -1,15 +1,10 @@
 #include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
+#include "..\\resources.h"
 
-CRendezvous r1("CreationRendezvous", 3); // sync creation of IO and elevators
+TheMonitor elevatorOneMonitor("Elevator One Monitor");
+CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 void initializeProcesses();
-void initializeMonitors();
-
-struct monitor {
-	int moveStatus; // 1 up, -1 down, 0 stationary
-	int doorStatus; // opening, closing, closed, open
-	int floor; // which floor it is on; European convention
-};
 
 struct IODispatch {
 	int valCom; // command to move floor
@@ -18,7 +13,6 @@ struct IODispatch {
 int main(void) {
 	cout << "Dispatcher running..." << endl;
 
-	//initializeMonitors();
 	initializeProcesses();
 
 	cout << "Dispatcher complete..." << endl;
@@ -45,7 +39,14 @@ void initializeProcesses() {
 		ACTIVE
 	);
 
-	// How to nest this in another function?
+	// Rendezvous to start processes together
+	r1.Wait();
+	for (int i = 0; i < 10; i++) {
+		cout << "Helloo " << i << " from dispatcher..." << endl;
+		Sleep(50);
+	}
+
+	// Typed pipe for data relay
 	int pipeIOData;
 	CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100);
 	while (1) {
@@ -56,30 +57,10 @@ void initializeProcesses() {
 		}
 	}
 
-	cout << "Elevator 1, 2, and IO activated..." << endl;
 	cout << "Waiting for self-made child process 1 to terminate..." << endl;
 	p1.WaitForProcess();
 	cout << "Waiting for self-made child process 2 to terminate..." << endl;
 	p2.WaitForProcess();
 	cout << "Waiting for self-made child process 3 to terminate..." << endl;
 	p3.WaitForProcess();
-}
-
-void initializeMonitors() {
-	CDataPool dp1("Monitor1", sizeof(struct monitor));
-	CDataPool dp2("Monitor2", sizeof(struct monitor));
-
-	struct monitor* monitor1 = (struct monitor*)(dp1.LinkDataPool());
-	struct monitor* monitor2 = (struct monitor*)(dp2.LinkDataPool());
-
-	cout << "Parent datapool linked at address " << monitor1 << endl;
-
-	monitor1->floor = 0;
-	monitor1->moveStatus = 0;
-	monitor1->doorStatus = 0;
-	monitor2->floor = 0;
-	monitor2->moveStatus = 0;
-	monitor2->doorStatus = 0;
-
-	cout << "Elevator 1, elevator 2, and IO initialized..." << endl;
 }
