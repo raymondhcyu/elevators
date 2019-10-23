@@ -123,10 +123,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\CPEN333Assignment1\resources.cpp" />
     <ClCompile Include="..\rt.cpp" />
     <ClCompile Include="Elevator2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\resources.h" />
     <ClInclude Include="..\rt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

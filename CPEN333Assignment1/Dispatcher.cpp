@@ -2,7 +2,7 @@
 #include "..\resources.h"
 
 //TheMonitor elevatorOneMonitor;
-//TheMonitor elevatorTwoMonitor;
+TheMonitor elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
@@ -32,7 +32,7 @@ int main(void) {
 	);
 
 	// Rendezvous to start processes together
-	r1.Wait();
+	//r1.Wait();
 	for (int i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from dispatcher..." << endl;
 		Sleep(50);

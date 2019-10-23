@@ -17,7 +17,7 @@ TheMonitor::TheMonitor() {
 	ps2->Signal();
 }
 
-// Update floor
+// Update floor (producer)
 void TheMonitor::setFloor(int initFloor) {
 	cs1->Wait();
 	cs2->Wait();
@@ -26,12 +26,13 @@ void TheMonitor::setFloor(int initFloor) {
 	ps2->Signal();
 }
 
+// Get floor (child)
 int TheMonitor::getFloor(void) {
-	cs1->Wait();
-	cs2->Wait();
+	ps1->Wait();
+	ps2->Wait();
 	int theFloor = dataPtr->floor; // can't return here else doesn't signal
-	ps1->Signal();
-	ps2->Signal();
+	cs1->Signal();
+	cs2->Signal();
 
 	return theFloor;
 }

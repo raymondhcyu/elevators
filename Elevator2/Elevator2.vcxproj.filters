@@ -21,9 +21,15 @@
     <ClCompile Include="..\rt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\CPEN333Assignment1\resources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\rt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\resources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
