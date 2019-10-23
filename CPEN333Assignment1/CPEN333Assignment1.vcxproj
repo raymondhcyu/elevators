@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="..\rt.cpp" />
     <ClCompile Include="Dispatcher.cpp" />
+    <ClCompile Include="resources.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\resources.h" />
