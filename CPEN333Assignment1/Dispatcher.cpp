@@ -4,8 +4,6 @@
 TheMonitor elevatorOneMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
-void initializeProcesses();
-
 struct IODispatch {
 	int valCom; // command to move floor
 };
@@ -13,13 +11,6 @@ struct IODispatch {
 int main(void) {
 	cout << "Dispatcher running..." << endl;
 
-	initializeProcesses();
-
-	cout << "Dispatcher complete..." << endl;
-	return 0;
-}
-
-void initializeProcesses() {
 	// Elevator 1 child process
 	CProcess p1("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\Elevator1.exe",
 		NORMAL_PRIORITY_CLASS,
@@ -63,4 +54,7 @@ void initializeProcesses() {
 	p2.WaitForProcess();
 	cout << "Waiting for self-made child process 3 to terminate..." << endl;
 	p3.WaitForProcess();
+
+	cout << "Dispatcher complete..." << endl;
+	return 0;
 }
