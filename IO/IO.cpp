@@ -1,6 +1,7 @@
 #include "..\rt.h"
 #include "..\resources.h"
 
+TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
@@ -13,7 +14,7 @@ void dispatchPipeline();
 int main() {
 	// Rendezvous to start
 	r1.Wait();
-	cout << "IO is done waiting" << endl;
+	cout << "IO initializing..." << endl;
 
 	int i;
 	for (i = 0; i < 10; i++) {
@@ -22,7 +23,7 @@ int main() {
 	}
 
 	//dispatchPipeline();
-
+	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorIO() << "..." << endl;
 	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorIO() << "..." << endl;
 
 	getchar();

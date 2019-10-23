@@ -7,7 +7,7 @@ CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 int main() {
 	// Rendezvous to start
 	r1.Wait();
-	cout << "Elevator process 2 is done waiting" << endl;
+	cout << "Elevator process 2 initializing..." << endl;
 
 	int i;
 	for (i = 0; i < 10; i++) {

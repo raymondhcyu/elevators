@@ -1,6 +1,7 @@
 #include "..\rt.h"
 #include "..\resources.h"
 
+TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
@@ -9,8 +10,6 @@ struct IODispatch {
 };
 
 int main(void) {
-	cout << "Dispatcher running..." << endl;
-
 	// Elevator 1 child process
 	CProcess p1("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\Elevator1.exe",
 		NORMAL_PRIORITY_CLASS,
@@ -32,6 +31,7 @@ int main(void) {
 
 	// Rendezvous to start processes together
 	r1.Wait();
+	cout << "Dispatcher initializing..." << endl;
 	for (int i = 0; i < 10; i++) {
 		cout << "Helloo " << i << " from dispatcher..." << endl;
 		Sleep(50);
@@ -48,6 +48,7 @@ int main(void) {
 	//	}
 	//}
 
+	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorDispatch() << "..." << endl;
 	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorDispatch() << "..." << endl;
 
 	p1.WaitForProcess();
