@@ -10,7 +10,6 @@ void dispatchPipeline();
 
 int main() {
 	// Rendezvous to start
-	Sleep(3500);
 	r1.Wait();
 	cout << "IO is done waiting" << endl;
 
