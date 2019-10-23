@@ -20,7 +20,8 @@ private:
 public:
 	TheMonitor(); // default constructor; default floor 0
 	void setFloor(int initFloor); // update floor
-	int getFloor(void); // floor currently on
+	int getFloorIO(void); // floor currently on
+	int getFloorDispatch(void); // floor currently on
 	~TheMonitor();
 };
 

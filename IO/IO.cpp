@@ -23,7 +23,7 @@ int main() {
 
 	//dispatchPipeline();
 
-	cout << "elevator 2 is on floor " << elevatorTwoMonitor.getFloor() << "..." << endl;
+	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorIO() << "..." << endl;
 
 	getchar();
 	return 0;

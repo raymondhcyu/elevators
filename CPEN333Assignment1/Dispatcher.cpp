@@ -49,11 +49,10 @@ int main(void) {
 	//	}
 	//}
 
-	cout << "Waiting for child process 1 to terminate..." << endl;
+	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorDispatch() << "..." << endl;
+
 	p1.WaitForProcess();
-	cout << "Waiting for child process 2 to terminate..." << endl;
 	p2.WaitForProcess();
-	cout << "Waiting for child process 3 to terminate..." << endl;
 	p3.WaitForProcess();
 
 	cout << "Dispatcher complete..." << endl;

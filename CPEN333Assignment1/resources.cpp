@@ -9,12 +9,6 @@ TheMonitor::TheMonitor() {
 	cs2 = new CSemaphore("CS2", 1, 1);
 	theDataPool = new CDataPool(string("DataPool"), sizeof(struct theData));
 	dataPtr = (struct theData*)(theDataPool->LinkDataPool());
-
-	cs1->Wait();
-	cs2->Wait();
-	dataPtr->floor = 0;
-	ps1->Signal();
-	ps2->Signal();
 }
 
 // Update floor (producer)
@@ -26,12 +20,19 @@ void TheMonitor::setFloor(int initFloor) {
 	ps2->Signal();
 }
 
-// Get floor (child)
-int TheMonitor::getFloor(void) {
+// Get floor (child dispatcher)
+int TheMonitor::getFloorDispatch(void) {
 	ps1->Wait();
-	ps2->Wait();
 	int theFloor = dataPtr->floor; // can't return here else doesn't signal
 	cs1->Signal();
+
+	return theFloor;
+}
+
+// Get floor (child IO)
+int TheMonitor::getFloorIO(void) {
+	ps2->Wait();
+	int theFloor = dataPtr->floor; // can't return here else doesn't signal
 	cs2->Signal();
 
 	return theFloor;
