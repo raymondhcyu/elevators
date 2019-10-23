@@ -1,5 +1,7 @@
-#include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
+#include "..\rt.h"
+#include "..\resources.h"
 
+//TheMonitor elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 int main() {
@@ -12,6 +14,8 @@ int main() {
 		cout << "Helloo " << i << " from elevator process 2..." << endl;
 		Sleep(50);
 	}
+
+	//elevatorTwoMonitor.setFloor(9);
 
 	getchar();
 	return 0;

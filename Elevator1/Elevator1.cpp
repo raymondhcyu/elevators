@@ -1,12 +1,7 @@
-/*
-	Produces data using named monitor
-*/
+#include "..\rt.h"
+#include "..\resources.h"
 
-#include "D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\rt.h"
-#include "..\\resources.h"
-
-TheMonitor elevatorOneMonitor();
-
+//TheMonitor elevatorOneMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 int main() {

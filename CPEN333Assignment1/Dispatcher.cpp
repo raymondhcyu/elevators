@@ -1,7 +1,8 @@
-#include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
-#include "..\\resources.h"
+#include "..\rt.h"
+#include "..\resources.h"
 
-TheMonitor elevatorOneMonitor;
+//TheMonitor elevatorOneMonitor;
+//TheMonitor elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
@@ -37,22 +38,22 @@ int main(void) {
 		Sleep(50);
 	}
 
-	// Typed pipe for data relay
-	int pipeIOData;
-	CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100);
-	while (1) {
-		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
-			PipeIODispatch.Read(&pipeIOData);
-			cout << "Dispatcher read " << pipeIOData << " from IO..." << endl;
-			break;
-		}
-	}
+	//// Typed pipe for data relay; future implementation into separate thread
+	//int pipeIOData;
+	//CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100);
+	//while (1) {
+	//	if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
+	//		PipeIODispatch.Read(&pipeIOData);
+	//		cout << "Dispatcher read " << pipeIOData << " from IO..." << endl;
+	//		break;
+	//	}
+	//}
 
-	cout << "Waiting for self-made child process 1 to terminate..." << endl;
+	cout << "Waiting for child process 1 to terminate..." << endl;
 	p1.WaitForProcess();
-	cout << "Waiting for self-made child process 2 to terminate..." << endl;
+	cout << "Waiting for child process 2 to terminate..." << endl;
 	p2.WaitForProcess();
-	cout << "Waiting for self-made child process 3 to terminate..." << endl;
+	cout << "Waiting for child process 3 to terminate..." << endl;
 	p3.WaitForProcess();
 
 	cout << "Dispatcher complete..." << endl;

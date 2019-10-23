@@ -1,5 +1,8 @@
-#include "D:\Documents\CPEN333\Assignments\CPEN333Assignment1\rt.h"
+#include "..\rt.h"
+#include "..\resources.h"
 
+//TheMonitor elevatorOneMonitor;
+//TheMonitor elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
@@ -19,7 +22,9 @@ int main() {
 		Sleep(50);
 	}
 
-	dispatchPipeline();
+	//dispatchPipeline();
+
+	//cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloor() << "..." << endl;
 
 	getchar();
 	return 0;

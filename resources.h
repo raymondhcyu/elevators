@@ -2,7 +2,6 @@
 #define __resources__
 
 #include "rt.h"
-#include <string.h>
 
 class TheMonitor {
 private:
