@@ -5,6 +5,8 @@ TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
+
+
 struct IODispatch {
 	int valCom; // command to move floor
 };
@@ -32,10 +34,6 @@ int main(void) {
 	// Rendezvous to start processes together
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
-	for (int i = 0; i < 10; i++) {
-		cout << "Helloo " << i << " from dispatcher..." << endl;
-		Sleep(50);
-	}
 
 	//// Typed pipe for data relay; future implementation into separate thread
 	//int pipeIOData;

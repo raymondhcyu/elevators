@@ -9,12 +9,6 @@ int main() {
 	r1.Wait();
 	cout << "Elevator process 1 initializing..." << endl;
 
-	int i;
-	for (i = 0; i < 10; i++) {
-		cout << "Helloo " << i << " from elevator process 1..." << endl;
-		Sleep(50);
-	}
-
 	elevatorOneMonitor.setFloor(4);
 
 	getchar();
