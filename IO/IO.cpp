@@ -16,7 +16,7 @@ int main() {
 	r1.Wait();
 	cout << "IO initializing..." << endl;
 
-	//dispatchPipeline();
+	dispatchPipeline();
 	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorIO() << "..." << endl;
 	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorIO() << "..." << endl;
 
