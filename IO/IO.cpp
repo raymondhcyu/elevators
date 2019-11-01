@@ -19,10 +19,16 @@ int main() {
 	cout << "IO initializing..." << endl;
 
 	char n = '\0';
-	cout << "Enter a valid command: ";
+	char m = '\0';
+	cout << "Enter a valid command: "; // expecting "ab"
 	while (n != 'a') {
 		n = _getch();
 	}
+	while (m != 'b') {
+		m = _getch();
+	}
+
+	cout << "You entered " << n << m << endl;
 
 	dispatchPipeline();
 	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorIO() << "..." << endl;
