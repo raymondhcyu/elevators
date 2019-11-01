@@ -16,7 +16,9 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
 			PipeIODispatch.Read(&pipeIOData);
+			console.Wait();
 			cout << "Dispatcher read " << pipeIOData << " from IO..." << endl;
+			console.Signal();
 			break;
 		}
 	}
