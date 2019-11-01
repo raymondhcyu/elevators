@@ -6,15 +6,15 @@ TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
-	char inputs[];
+	char inputs[3];
 };
 
 IODispatch pipeIOData;
 
 UINT __stdcall Thread1(void* args) {
-	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 ints
+	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 	while (1) {
-		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
+		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 2) {
 			PipeIODispatch.Read(&pipeIOData);
 			console.Wait();
 			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;

@@ -10,7 +10,7 @@ TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
-	char inputs[];
+	char inputs[3];
 };
 
 void dispatchPipeline(char* inputs);
@@ -20,7 +20,7 @@ int main() {
 	r1.Wait();
 	cout << "IO initializing..." << endl;
 
-	char input[] = {'\0', '\0'};
+	char input[3] = { '\0', '\0' };
 	cout << "Enter a valid command: "; // expecting "u2"
 	while (input[0] != 'u') {
 		input[0] = _getch();
@@ -28,7 +28,7 @@ int main() {
 	while (input[1] != '2') {
 		input[1] = _getch();
 	}
-	cout << "You entered " << input[0] << input[1] << endl;
+	cout << "You entered " << input << endl;
 
 	dispatchPipeline(input);
 	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorIO() << "..." << endl;
@@ -45,6 +45,7 @@ void dispatchPipeline(char* userInput) {
 	strcpy(dispatch.inputs, userInput); // copy input to struct, change to receive user input later
 
 	PipeIODispatch.Write(&dispatch);
+
 	cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
 	cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
 }
