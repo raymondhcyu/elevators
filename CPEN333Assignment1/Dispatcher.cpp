@@ -14,7 +14,7 @@ IODispatch pipeIOData;
 UINT __stdcall Thread1(void* args) {
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 	while (1) {
-		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 2) {
+		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
 			console.Wait();
 			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
