@@ -51,8 +51,10 @@ int main(void) {
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
 
+	console.Wait();
 	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorDispatch() << "..." << endl;
 	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorDispatch() << "..." << endl;
+	console.Signal();
 
 	t1.WaitForThread();
 

@@ -1,5 +1,7 @@
 #include "..\rt.h"
 #include "..\resources.h"
+#include <conio.h>
+#include <stdio.h>
 
 TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
@@ -15,6 +17,12 @@ int main() {
 	// Rendezvous to start
 	r1.Wait();
 	cout << "IO initializing..." << endl;
+
+	char n = '\0';
+	cout << "Enter a valid command: ";
+	while (n != 'a') {
+		n = _getch();
+	}
 
 	dispatchPipeline();
 	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorIO() << "..." << endl;
