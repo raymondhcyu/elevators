@@ -5,19 +5,19 @@ TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
-int pipeIOData;
-
 struct IODispatch {
-	int valCom; // command to move floor
+	char inputs[];
 };
 
+IODispatch pipeIOData;
+
 UINT __stdcall Thread1(void* args) {
-	CTypedPipe <int> PipeIODispatch("PipelineIODispatch", 100); // room for 100 ints
+	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 ints
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 4) {
 			PipeIODispatch.Read(&pipeIOData);
 			console.Wait();
-			cout << "Dispatcher read " << pipeIOData << " from IO..." << endl;
+			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
 			console.Signal();
 			break;
 		}
