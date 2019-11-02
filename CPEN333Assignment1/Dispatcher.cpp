@@ -6,7 +6,7 @@ TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 char exitProgram[] = { 'e', 'e', '\0' };
-char upTwo[] = { 'u', '2', '\0'};
+char upTwo[] = { 'u', '2', '\0' };
 
 struct IODispatch {
 	char inputs[3];
@@ -20,11 +20,9 @@ UINT __stdcall Thread1(void* args) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
 
-			//if (pipeIOData.inputs == upTwo) {
-			//	console.Wait();
-			//	cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
-			//	console.Signal();
-			//}
+			console.Wait();
+			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
+			console.Signal();
 
 			break;
 		}
@@ -36,8 +34,11 @@ UINT __stdcall Thread2(void* args) {
 
 	//while (pipeIOData.inputs != exitProgram) {
 	while (1) {
-		if (pipeIOData.inputs == upTwo) {
-			cout << "Command received: " << pipeIOData.inputs << endl;
+		if (strcmp(pipeIOData.inputs, upTwo) == 0) {
+			console.Wait();
+			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
+			console.Signal();
+			break;
 		}
 	}
 
