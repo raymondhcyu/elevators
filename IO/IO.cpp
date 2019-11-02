@@ -46,8 +46,8 @@ void dispatchPipeline(char* userInput) {
 	strcpy(dispatch.inputs, userInput); // copy input to struct, change to receive user input later
 
 	PipeIODispatch.Write(&dispatch);
-	cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
-	cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
+	//cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
+	//cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
 }
 
 void displayUpdates(void) {

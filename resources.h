@@ -5,6 +5,8 @@
 
 const CMutex console("Console");
 
+
+
 class TheMonitorOne {
 private:
 	struct theData {

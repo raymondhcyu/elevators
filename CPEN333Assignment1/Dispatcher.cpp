@@ -5,6 +5,9 @@ TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
+char exitProgram[] = { 'e', 'e', '\0' };
+char upTwo[] = { 'u', '2', '\0'};
+
 struct IODispatch {
 	char inputs[3];
 };
@@ -16,12 +19,28 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
-			console.Wait();
-			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
-			console.Signal();
+
+			//if (pipeIOData.inputs == upTwo) {
+			//	console.Wait();
+			//	cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
+			//	console.Signal();
+			//}
+
 			break;
 		}
 	}
+	return 0;
+}
+
+UINT __stdcall Thread2(void* args) {
+
+	//while (pipeIOData.inputs != exitProgram) {
+	while (1) {
+		if (pipeIOData.inputs == upTwo) {
+			cout << "Command received: " << pipeIOData.inputs << endl;
+		}
+	}
+
 	return 0;
 }
 
@@ -46,6 +65,7 @@ int main(void) {
 	);
 
 	CThread t1(Thread1, ACTIVE, NULL);
+	CThread t2(Thread2, ACTIVE, NULL);
 
 	// Rendezvous to start processes together
 	r1.Wait();
@@ -57,6 +77,7 @@ int main(void) {
 	console.Signal();
 
 	t1.WaitForThread();
+	t2.WaitForThread();
 
 	p1.WaitForProcess();
 	p2.WaitForProcess();
