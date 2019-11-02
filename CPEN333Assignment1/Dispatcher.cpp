@@ -19,11 +19,6 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
-
-			console.Wait();
-			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
-			console.Signal();
-
 			break;
 		}
 	}
@@ -32,11 +27,16 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 
-	//while (pipeIOData.inputs != exitProgram) {
 	while (1) {
 		if (strcmp(pipeIOData.inputs, upTwo) == 0) {
 			console.Wait();
 			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
+			console.Signal();
+			break;
+		}
+		else if (strcmp(pipeIOData.inputs, exitProgram) == 0) {
+			console.Wait();
+			cout << "Program exitting..." << endl;
 			console.Signal();
 			break;
 		}
