@@ -1,5 +1,6 @@
 #include "..\rt.h"
 #include "..\resources.h"
+#include <unordered_map>
 
 TheMonitorOne elevatorOneMonitor;
 TheMonitorTwo elevatorTwoMonitor;
@@ -13,12 +14,35 @@ struct IODispatch {
 };
 
 IODispatch pipeIOData;
+int messagePacket[5] = {};
+
+CSemaphore messagePacketProducer("MessagePacketProducer", 0);
+CSemaphore messagePacketConsumer("MessagePacketProducer", 1);
 
 UINT __stdcall Thread1(void* args) {
+
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
+	
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
+
+			std::cout << "Received " << pipeIOData.inputs << endl;
+
+			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
+
+			messagePacket[0] = 1;
+			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
+			messagePacket[2] = 1;
+			messagePacket[3] = 0;
+			messagePacket[4] = atoi(&pipeIOData.inputs[1]);
+
+			//messagePacketConsumer.Wait();
+			//messagePacketProducer.Signal();
+			cout << "Message packet content is ";
+			for (auto& mpData : messagePacket) // GCOM magic
+				cout << mpData;
+			cout << endl;
 			break;
 		}
 	}
@@ -27,20 +51,20 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 
-	while (1) {
-		if (strcmp(pipeIOData.inputs, upTwo) == 0) {
-			console.Wait();
-			cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
-			console.Signal();
-			break;
-		}
-		else if (strcmp(pipeIOData.inputs, exitProgram) == 0) {
-			console.Wait();
-			cout << "Program exitting..." << endl;
-			console.Signal();
-			break;
-		}
-	}
+	//while (1) {
+	//	if (strcmp(pipeIOData.inputs, upTwo) == 0) {
+	//		console.Wait();
+	//		cout << "Dispatcher read " << pipeIOData.inputs << " from IO..." << endl;
+	//		console.Signal();
+	//		break;
+	//	}
+	//	else if (strcmp(pipeIOData.inputs, exitProgram) == 0) {
+	//		console.Wait();
+	//		cout << "Program exitting..." << endl;
+	//		console.Signal();
+	//		break;
+	//	}
+	//}
 
 	return 0;
 }

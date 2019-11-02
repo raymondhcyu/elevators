@@ -22,7 +22,7 @@ int main() {
 	cout << "IO initializing..." << endl;
 
 	// Get user input (move to separate function later)
-	char input[3] = { '\0', '\0' };
+	char input[3] = {};
 	cout << "Enter a valid command: "; // expecting "u2"
 	while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 	//while (input[0] != 'u') {

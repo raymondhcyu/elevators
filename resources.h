@@ -1,11 +1,21 @@
+/*
+Message packet format to be passed to/from elevators
+_ _ _ _ _
+0 1 2 3 4
+
+0: Elevator number (1 or 2)
+1: Direction (0 not moving, 1 down, 2 up)
+2: Service status (0 out of service, 1 in service)
+3: Door status (0 closed, 1 open)
+4: Floor status (0 - 9)
+*/
+
 #ifndef __resources__
 #define __resources__
 
 #include "rt.h"
 
 const CMutex console("Console");
-
-
 
 class TheMonitorOne {
 private:
