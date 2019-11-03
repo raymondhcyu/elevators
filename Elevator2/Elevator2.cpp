@@ -9,8 +9,6 @@ int main() {
 	r1.Wait();
 	cout << "Elevator process 2 initializing..." << endl;
 
-	elevatorTwoMonitor.setFloor(9);
-
 	getchar();
 	return 0;
 }

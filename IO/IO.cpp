@@ -21,12 +21,12 @@ int main() {
 	r1.Wait();
 	cout << "IO initializing..." << endl;
 
+	cout << "\nElevator 1\nDoors\t\tFloor\t\tService status\t\tOther Status\n" << endl;
+
 	while (1) {
 		// Get user input (move to separate function later)
-		cout << __LINE__ << endl;
 		char input[3] = {};
 		cout << "Enter a valid command: "; // expecting "u2"
-		cout << __LINE__ << endl;
 		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 			input[0] = _getch();
 			cout << __LINE__ << endl;
@@ -36,11 +36,8 @@ int main() {
 			cout << __LINE__ << endl;
 		}
 
-		cout << __LINE__ << endl;
 		dispatchPipeline(input);
-		cout << __LINE__ << endl;
-		// displayUpdates();
-		cout << __LINE__ << endl;
+		displayUpdates();
 	}
 	return 0;
 }
@@ -56,11 +53,9 @@ void dispatchPipeline(char* userInput) {
 	//cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
 }
 
-void displayUpdates(void) {
-	cout << "\nElevator 1\nDoors\t\tFloor\t\tService status\t\tOther Status" << endl;
-	
-	MOVE_CURSOR(0, 6);
-	cout << "\t\t" << elevatorOneMonitor.getFloorIO() << endl;
+void displayUpdates(void) {	
+	//MOVE_CURSOR(0, 5);
+	//cout << "\t\t" << elevatorOneMonitor.getFloorIO() << endl;
 
 	//cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorIO() << "..." << endl;
 }

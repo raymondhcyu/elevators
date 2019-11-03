@@ -14,10 +14,12 @@ struct IODispatch {
 
 IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
-int elevatorOneMessage = 0; // message packet to be sent to E1 mailbox
+int E1Message = 0; // message packet to be sent to E1 mailbox
 
 CSemaphore messagePacketProducer("MessagePacketProducer", 0);
 CSemaphore messagePacketConsumer("MessagePacketConsumer", 1);
+CSemaphore E1MailProducer("E1MailProducer", 0);
+CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 
@@ -29,26 +31,37 @@ UINT __stdcall Thread1(void* args) {
 			cout << __LINE__ << endl;
 
 			std::cout << "Received " << pipeIOData.inputs << endl;
+			if (pipeIOData.inputs[0] == 'e') {
+				console.Wait();
+				cout << "Program should exit now" << endl;
+				console.Signal();
+			}
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
-
-			//messagePacketConsumer.Wait();
+			
 			cout << __LINE__ << endl;
+
+			// Up or down commands only
+			messagePacketConsumer.Wait();
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
 			messagePacket[2] = 1;
 			messagePacket[3] = 0;
 			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
-			//messagePacketProducer.Signal();
-			cout << __LINE__ << endl;
+
+			// Convert message packet int array to int
+			for (int i = 0; i < 5; i++) {
+				E1Message *= 10;
+				E1Message += messagePacket[i];
+			}
 
 			console.Wait();
-			cout << __LINE__ << endl;
 			cout << "Message packet content is ";
 			for (auto& mpData : messagePacket) // GCOM magic
 				cout << mpData;
 			cout << endl;
-			cout << __LINE__ << endl;
 			console.Signal();
+			messagePacketProducer.Signal();
+
 			cout << __LINE__ << endl;
 		}
 	}
@@ -56,19 +69,18 @@ UINT __stdcall Thread1(void* args) {
 }
 
 UINT __stdcall Thread2(void* args) {
-	//messagePacketProducer.Wait();
-	//// Convert message packet int array to int
-	//for (int i = 0; i < 5; i++) {
-	//	elevatorOneMessage *= 10;
-	//	elevatorOneMessage += messagePacket[i];
-	//}
-	//messagePacketConsumer.Signal();
+	while (1) {
+		cout << __LINE__ << endl;
+		messagePacketProducer.Wait(); // consume message from pipeline
+		//E1MailConsumer.Wait(); // produce message for mailbox
+		console.Wait();
+		cout << "Elevator one message: " << E1Message << endl;
+		E1Message = 0;
+		console.Signal();
+		//E1MailProducer.Signal();
+		messagePacketConsumer.Signal();
+	}
 
-	//// *** Need separate semaphores for elevator one message to send to elevator mailbox
-
-	//console.Wait();
-	//cout << "Elevator one message is: " << elevatorOneMessage << endl;
-	//console.Signal();
 	return 0;
 }
 
@@ -99,10 +111,12 @@ int main(void) {
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
 
-	console.Wait();
-	cout << "Elevator 1 is on floor " << elevatorOneMonitor.getFloorDispatch() << "..." << endl;
-	cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorDispatch() << "..." << endl;
-	console.Signal();
+	//while (1) {
+	//	E1MailProducer.Wait();
+	//	p1.Post(E1Message);
+	//	E1Message = 0; // reset message after sent
+	//	E1MailProducer.Signal();
+	//}
 
 	t1.WaitForThread();
 	t2.WaitForThread();

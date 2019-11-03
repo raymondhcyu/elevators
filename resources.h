@@ -8,6 +8,9 @@ _ _ _ _ _
 2: Service status (0 out of service, 1 in service)
 3: Door status (0 closed, 1 open)
 4: Floor status (0 - 9)
+
+Debugging tip: "Sprinkle print lines"
+			cout << __LINE__ << endl;
 */
 
 #ifndef __resources__
@@ -21,6 +24,9 @@ class TheMonitorOne {
 private:
 	struct theData {
 		int floor; // which floor it is on; European convention
+		int doorStatus;
+		int direction;
+		int serviceStatus;
 	};
 
 	CDataPool* theDataPool;  // a datapool containing the data to be protected 
@@ -33,9 +39,9 @@ private:
 
 public:
 	TheMonitorOne(); // default constructor; default floor 0
-	void setFloor(int initFloor); // update floor
-	int getFloorIO(void); // floor currently on
-	int getFloorDispatch(void); // floor currently on
+	void setInfo(int *data); // set data in message packet format
+	int getInfoIO(void); // get data in message packet format
+	int getInfoDispatch(void); // get data in message packet format
 	~TheMonitorOne();
 };
 
