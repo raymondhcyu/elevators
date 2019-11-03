@@ -1,3 +1,3 @@
 # Dual Elevators!
 
-![Screenshot](link-to-image)
+![Screenshot](pic.png)
