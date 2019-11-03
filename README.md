@@ -1,3 +1,3 @@
 # Dual Elevators!
 
-![Screenshot](pic.png)
+![Screenshot](https://github.com/raymondhcyu/elevators/blob/master/pic.PNG)
