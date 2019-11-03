@@ -2,8 +2,8 @@
 #include "..\resources.h"
 #include <unordered_map>
 
-TheMonitorOne elevatorOneMonitor;
-TheMonitorTwo elevatorTwoMonitor;
+TheMonitorOne E1Monitor;
+TheMonitorTwo E2Monitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 char exitProgram[] = { 'e', 'e', '\0' };
@@ -28,7 +28,6 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
-			cout << __LINE__ << endl;
 
 			std::cout << "Received " << pipeIOData.inputs << endl;
 			if (pipeIOData.inputs[0] == 'e') {
@@ -38,8 +37,6 @@ UINT __stdcall Thread1(void* args) {
 			}
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 			
-			cout << __LINE__ << endl;
-
 			// Up or down commands only
 			messagePacketConsumer.Wait();
 			messagePacket[0] = 1;
@@ -55,8 +52,6 @@ UINT __stdcall Thread1(void* args) {
 			cout << endl;
 			console.Signal();
 			messagePacketProducer.Signal();
-
-			cout << __LINE__ << endl;
 		}
 	}
 	return 0;
@@ -64,22 +59,21 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 	while (1) {
-		cout << __LINE__ << endl;
 		messagePacketProducer.Wait(); // consume message from pipeline
-		//E1MailConsumer.Wait(); // produce message for mailbox
-		console.Wait();
+		E1MailConsumer.Wait(); // produce message for mailbox
+
 		// Convert message packet int array to int
 		for (int i = 0; i < 5; i++) {
 			E1Message *= 10;
 			E1Message += messagePacket[i];
 		}
+		console.Wait();
 		cout << "Elevator one message: " << E1Message << endl;
-		E1Message = 0;
 		console.Signal();
-		//E1MailProducer.Signal();
+
+		E1MailProducer.Signal();
 		messagePacketConsumer.Signal();
 	}
-
 	return 0;
 }
 
@@ -110,12 +104,14 @@ int main(void) {
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
 
-	//while (1) {
-	//	E1MailProducer.Wait();
-	//	p1.Post(E1Message);
-	//	E1Message = 0; // reset message after sent
-	//	E1MailProducer.Signal();
-	//}
+	while (1) {
+		E1MailProducer.Wait();
+		if (E1Message != 0)
+			p1.Post(E1Message);
+		E1Message = 0; // reset message after sent
+		cout << "Elevator 1 info: " << E1Monitor.getInfoDispatch() << endl;
+		E1MailConsumer.Signal();
+	}
 
 	t1.WaitForThread();
 	t2.WaitForThread();

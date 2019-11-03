@@ -5,8 +5,8 @@
 #include <conio.h>
 #include <stdio.h>
 
-TheMonitorOne elevatorOneMonitor;
-TheMonitorTwo elevatorTwoMonitor;
+TheMonitorOne E1Monitor;
+TheMonitorTwo E2Monitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 struct IODispatch {
@@ -26,16 +26,14 @@ int main() {
 	while (1) {
 		// Get user input (move to separate function later)
 		char input[3] = {};
-		cout << "Enter a valid command: "; // expecting "u2"
+		cout << "Enter a valid command: ";
 		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 			input[0] = _getch();
-			cout << __LINE__ << endl;
 		}
 		while ((input[1] != '2') && (input[1] != 'e')) {
 			input[1] = _getch();
-			cout << __LINE__ << endl;
 		}
-
+		cout << endl;
 		dispatchPipeline(input);
 		displayUpdates();
 	}
@@ -53,9 +51,9 @@ void dispatchPipeline(char* userInput) {
 	//cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
 }
 
-void displayUpdates(void) {	
-	//MOVE_CURSOR(0, 5);
-	//cout << "\t\t" << elevatorOneMonitor.getFloorIO() << endl;
+void displayUpdates(void) {
+	cout << "Elevator 1 info: " << E1Monitor.getInfoIO() << endl;
 
-	//cout << "Elevator 2 is on floor " << elevatorTwoMonitor.getFloorIO() << "..." << endl;
+	//MOVE_CURSOR(0, 5);
+	//cout << "\t\t" << E1Monitor.getFloorIO() << endl;
 }
