@@ -13,19 +13,32 @@ struct IODispatch {
 	char inputs[3];
 };
 
+int E1Status[5] = {};
+
 void dispatchPipeline(char* inputs);
 void displayUpdates();
+
+UINT __stdcall Thread1(void* args) {
+	//console.Wait();
+	//MOVE_CURSOR(0, 7);
+	//cout << "Elevator 1 info: " << E1Monitor.getInfoIO() << endl;
+	//console.Signal();
+	return 0;
+}
 
 int main() {
 	// Rendezvous to start
 	r1.Wait();
-	cout << "IO initializing..." << endl;
+	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
 
-	cout << "\nElevator 1\nDoors\t\tFloor\t\tService status\t\tOther Status\n" << endl;
+	CThread t1(Thread1, ACTIVE, NULL);
 
 	while (1) {
 		// Get user input (move to separate function later)
 		char input[3] = {};
+
+		console.Wait();
+		MOVE_CURSOR(0, 4);
 		cout << "Enter a valid command: ";
 		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 			input[0] = _getch();
@@ -34,9 +47,57 @@ int main() {
 			input[1] = _getch();
 		}
 		cout << endl;
+		console.Signal();
+
 		dispatchPipeline(input);
-		displayUpdates();
+
+		// Convert monitor update to data
+		int E1Update = E1Monitor.getInfoIO();
+		for (int i = 4; i >= 0; i--) {
+			E1Status[i] = E1Update % 10;
+			E1Update /= 10;
+		}
+
+		console.Wait();
+		if (E1Status[0] == 1) {
+			MOVE_CURSOR(0, 2);
+
+			switch (E1Status[1]) {
+			case 2:
+				cout << "Up			";
+				break;
+			case 1:
+				cout << "Down			";
+				break;
+			case 0:
+				cout << "Not moving		";
+				break;
+			}
+
+			switch (E1Status[2]) {
+			case 0:
+				cout << "Out of service	";
+				break;
+			case 1:
+				cout << "In service		";
+				break;
+			}
+
+			switch (E1Status[3]) {
+			case 0:
+				cout << "Closed			";
+				break;
+			case 1:
+				cout << "Open			";
+				break;
+			}
+
+			cout << E1Status[4];
+		}
+		console.Signal();
 	}
+
+	t1.WaitForThread();
 	return 0;
 }
 
@@ -49,11 +110,4 @@ void dispatchPipeline(char* userInput) {
 	PipeIODispatch.Write(&dispatch);
 	//cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
 	//cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
-}
-
-void displayUpdates(void) {
-	cout << "Elevator 1 info: " << E1Monitor.getInfoIO() << endl;
-
-	//MOVE_CURSOR(0, 5);
-	//cout << "\t\t" << E1Monitor.getFloorIO() << endl;
 }
