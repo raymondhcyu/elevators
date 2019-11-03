@@ -48,12 +48,6 @@ UINT __stdcall Thread1(void* args) {
 			messagePacket[3] = 0;
 			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
 
-			// Convert message packet int array to int
-			for (int i = 0; i < 5; i++) {
-				E1Message *= 10;
-				E1Message += messagePacket[i];
-			}
-
 			console.Wait();
 			cout << "Message packet content is ";
 			for (auto& mpData : messagePacket) // GCOM magic
@@ -74,6 +68,11 @@ UINT __stdcall Thread2(void* args) {
 		messagePacketProducer.Wait(); // consume message from pipeline
 		//E1MailConsumer.Wait(); // produce message for mailbox
 		console.Wait();
+		// Convert message packet int array to int
+		for (int i = 0; i < 5; i++) {
+			E1Message *= 10;
+			E1Message += messagePacket[i];
+		}
 		cout << "Elevator one message: " << E1Message << endl;
 		E1Message = 0;
 		console.Signal();
