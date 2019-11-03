@@ -21,21 +21,27 @@ int main() {
 	r1.Wait();
 	cout << "IO initializing..." << endl;
 
-	// Get user input (move to separate function later)
-	char input[3] = {};
-	cout << "Enter a valid command: "; // expecting "u2"
-	while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
-	//while (input[0] != 'u') {
-		input[0] = _getch();
-	}
-	while ((input[1] != '2') && (input[1] != 'e')) {
-		input[1] = _getch();
-	}
+	while (1) {
+		// Get user input (move to separate function later)
+		cout << __LINE__ << endl;
+		char input[3] = {};
+		cout << "Enter a valid command: "; // expecting "u2"
+		cout << __LINE__ << endl;
+		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
+			input[0] = _getch();
+			cout << __LINE__ << endl;
+		}
+		while ((input[1] != '2') && (input[1] != 'e')) {
+			input[1] = _getch();
+			cout << __LINE__ << endl;
+		}
 
-	dispatchPipeline(input);
-	displayUpdates();
-
-	getchar();
+		cout << __LINE__ << endl;
+		dispatchPipeline(input);
+		cout << __LINE__ << endl;
+		// displayUpdates();
+		cout << __LINE__ << endl;
+	}
 	return 0;
 }
 

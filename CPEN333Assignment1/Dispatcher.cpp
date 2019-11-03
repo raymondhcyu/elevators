@@ -26,44 +26,49 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
+			cout << __LINE__ << endl;
 
 			std::cout << "Received " << pipeIOData.inputs << endl;
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 
-			messagePacketConsumer.Wait();
+			//messagePacketConsumer.Wait();
+			cout << __LINE__ << endl;
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
 			messagePacket[2] = 1;
 			messagePacket[3] = 0;
 			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
-			messagePacketProducer.Signal();
+			//messagePacketProducer.Signal();
+			cout << __LINE__ << endl;
 
 			console.Wait();
+			cout << __LINE__ << endl;
 			cout << "Message packet content is ";
 			for (auto& mpData : messagePacket) // GCOM magic
 				cout << mpData;
 			cout << endl;
+			cout << __LINE__ << endl;
 			console.Signal();
-			break;
+			cout << __LINE__ << endl;
 		}
 	}
 	return 0;
 }
 
 UINT __stdcall Thread2(void* args) {
-	messagePacketProducer.Wait();
-	// Convert message packet int array to int
-	for (int i = 0; i < 5; i++) {
-		elevatorOneMessage *= 10;
-		elevatorOneMessage += messagePacket[i];
-	}
-	messagePacketConsumer.Signal();
+	//messagePacketProducer.Wait();
+	//// Convert message packet int array to int
+	//for (int i = 0; i < 5; i++) {
+	//	elevatorOneMessage *= 10;
+	//	elevatorOneMessage += messagePacket[i];
+	//}
+	//messagePacketConsumer.Signal();
 
-	// *** Need separate semaphores for elevator one message to send to elevator mailbox
+	//// *** Need separate semaphores for elevator one message to send to elevator mailbox
 
-	console.Wait();
-	cout << "Elevator one message is: " << elevatorOneMessage << endl;
-	console.Signal();
+	//console.Wait();
+	//cout << "Elevator one message is: " << elevatorOneMessage << endl;
+	//console.Signal();
 	return 0;
 }
 
