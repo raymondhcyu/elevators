@@ -89,6 +89,8 @@ UINT __stdcall Thread1(void* args) {
 			//	console.Signal();
 			//}
 
+			E1MessagePrevious = 0; // reset previous message since command complete
+
 			// Convert message packet int array to int
 			for (int i = 0; i < 5; i++) {
 				E1Message *= 10;
