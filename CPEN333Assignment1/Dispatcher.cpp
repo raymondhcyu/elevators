@@ -20,8 +20,6 @@ int startFlag = 0;
 
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
-CSemaphore E1CompareProducer("E1CompareProducer", 0);
-CSemaphore E1CompareConsumer("E1CompareConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 
@@ -113,14 +111,20 @@ UINT __stdcall Thread2(void* args) {
 
 		E1MessageResponse = E1Monitor.getInfoDispatch();
 
+		console.Wait();
+		cout << "E1 Message response: " << E1MessageResponse << endl;
+		cout << "E1 Message previous: " << E1MessagePrevious << endl;
+		console.Signal();
+
+		// Add one time marker?
 		if (E1MessageResponse != E1MessagePrevious) {
 			cout << __LINE__ << endl;
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious; // send previous message back
+
 			cout << __LINE__ << endl;
 			E1MailProducer.Signal();
 		}
-
 		cout << __LINE__ << endl;
 	}
 	return 0;
@@ -155,7 +159,6 @@ int main(void) {
 
 	while (1) {
 		cout << __LINE__ << endl;
-
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
 		if (E1Message != 0) {
@@ -164,7 +167,6 @@ int main(void) {
 		E1Message = 0; // reset message after sent
 		E1MailConsumer.Signal();
 		cout << __LINE__ << endl;
-
 	}
 
 	t1.WaitForThread();
