@@ -17,47 +17,11 @@ int E1Status[5] = {};
 
 void dispatchPipeline(char* inputs);
 
-int startFlag = 0; // flag for activities to start only at beginning of program
-
-int main() {
-	// Rendezvous to start
-	r1.Wait();
-	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
-
-	if (startFlag == 0) { // start condition
-		console.Wait();
-		MOVE_CURSOR(0, 2);
-		cout << "Not moving		";
-		cout << "In service		";
-		cout << "Open			";
-		cout << 0;
-		startFlag == 1;
-		console.Signal();
-	}
-
+UINT __stdcall Thread1(void* args) {
 	while (1) {
-		// Get user input (move to separate function later)
-		char input[3] = {};
-
-		console.Wait();
-		MOVE_CURSOR(0, 4);
-		cout << "Enter a valid command: ";
-		// @ JASON DO THIS ***********************************************************
-		// Take more inputs like -1 -2 +1 +2 ee
-		// Display correct character inputs if possible instead of uuuuuuu2
-		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
-			input[0] = _getch();
-		}
-		while ((input[1] != '2') && (input[1] != '1') && (input[1] != '0') && (input[1] != 'e')) {
-			input[1] = _getch();
-		}
-		cout << endl;
-		console.Signal();
-
-		dispatchPipeline(input);
-
 		// Convert monitor update int to int array for processing
-		int E1Update = E1Monitor.getInfoIO();
+		int E1Update = E1Monitor.getInfoIO(); // wait for data?
+
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;
@@ -99,9 +63,43 @@ int main() {
 
 			cout << E1Status[4];
 		}
+
+		MOVE_CURSOR(24, 4); // hotfix to move cursor back to input
 		console.Signal();
 	}
+	return 0;
+}
 
+int main() {
+	// Rendezvous to start
+	r1.Wait();
+	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
+
+	CThread t1(Thread1, ACTIVE, NULL);
+
+	while (1) {
+		// Get user input (move to separate function later)
+		char input[3] = {};
+
+		console.Wait();
+		MOVE_CURSOR(0, 4);
+		cout << "Enter a valid command: ";
+		console.Signal();
+		// @ JASON DO THIS ***********************************************************
+		// Take more inputs like -1 -2 +1 +2 ee
+		// Do not accept inputs like 'de' or 'ue'
+		// Display correct character inputs if possible instead of uuuuuuu2
+		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
+			input[0] = _getch();
+		}
+		while ((input[1] != '2') && (input[1] != '1') && (input[1] != '0') && (input[1] != 'e')) {
+			input[1] = _getch();
+		}
+
+		dispatchPipeline(input);
+	}
+
+	t1.WaitForThread();
 	return 0;
 }
 

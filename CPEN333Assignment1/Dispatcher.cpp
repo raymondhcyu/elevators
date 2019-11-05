@@ -19,7 +19,21 @@ CSemaphore messagePacketConsumer("MessagePacketConsumer", 1);
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
+int startFlag = 0;
+
 UINT __stdcall Thread1(void* args) {
+
+	if (startFlag == 0) {
+		messagePacketConsumer.Wait();
+		// 10110
+		messagePacket[0] = 1;
+		messagePacket[1] = 0;
+		messagePacket[2] = 1;
+		messagePacket[3] = 1;
+		messagePacket[4] = 0;
+		messagePacketProducer.Signal();
+		startFlag = 1;
+	}
 
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 
