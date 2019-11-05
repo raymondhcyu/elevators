@@ -23,7 +23,7 @@ int startFlag = 0;
 
 UINT __stdcall Thread1(void* args) {
 
-	if (startFlag == 0) {
+	if (startFlag == 0) { // only happens once, sends start command to elevator once entire process starts
 		messagePacketConsumer.Wait();
 		// 10110
 		messagePacket[0] = 1;
