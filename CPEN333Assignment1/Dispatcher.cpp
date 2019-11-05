@@ -46,8 +46,10 @@ UINT __stdcall Thread1(void* args) {
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 
 	while (1) {
+
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
+			cout << __LINE__ << endl;
 
 			// Debugging
 			console.Wait();
@@ -62,8 +64,14 @@ UINT __stdcall Thread1(void* args) {
 
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 			
+			cout << __LINE__ << endl;
+
 			// Up or down commands only 
 			E1MailConsumer.Wait(); // produce message for mailbox
+
+			cout << __LINE__ << endl;
+
+
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
 			messagePacket[2] = 1;
@@ -96,7 +104,11 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 	while (1) {
+		cout << __LINE__ << endl;
 
+		cout << "Received elevator one info: " << E1Monitor.getInfoDispatch() << endl;
+
+		cout << __LINE__ << endl;
 	}
 	return 0;
 }
@@ -122,29 +134,27 @@ int main(void) {
 	);
 
 	CThread t1(Thread1, ACTIVE, NULL);
-	//CThread t2(Thread2, ACTIVE, NULL);
+	CThread t2(Thread2, ACTIVE, NULL);
 
 	// Rendezvous to start processes together
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
 
 	while (1) {
+		cout << __LINE__ << endl;
 
+		// Send mail to E1 through p1
 		E1MailProducer.Wait();
-
-		// If getinfodispatch != prev command send out again
-
 		if (E1Message != 0)
 			p1.Post(E1Message);
 		E1Message = 0; // reset message after sent
-
-		cout << "Received elevator one info: " << E1Monitor.getInfoDispatch() << endl;
-
 		E1MailConsumer.Signal();
+		cout << __LINE__ << endl;
+
 	}
 
 	t1.WaitForThread();
-	//t2.WaitForThread();
+	t2.WaitForThread();
 
 	p1.WaitForProcess();
 	p2.WaitForProcess();
