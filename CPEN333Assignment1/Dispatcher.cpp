@@ -16,7 +16,9 @@ int messagePacketPrevious[5] = {}; // previous message packet for comparison
 int E1Message = 0; // message packet to be sent to E1 mailbox
 int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for comparison
 int E1MessageResponse = 0; // update from E1
-int startFlag = 0;
+
+int startFlag = 0; // start flag to initialize elevator
+int doorFlag = 0; // flag to send message again to E1
 
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
@@ -121,10 +123,17 @@ UINT __stdcall Thread2(void* args) {
 			cout << __LINE__ << endl;
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious; // send previous message back
-
 			cout << __LINE__ << endl;
 			E1MailProducer.Signal();
+			doorFlag = 1;
 		}
+		else if (doorFlag == 1) {
+			E1MailConsumer.Wait();
+			E1Message = E1MessagePrevious; // send previous message back one more time to open doors
+			E1MailProducer.Signal();
+			doorFlag = 0; // reset door flag
+		}
+
 		cout << __LINE__ << endl;
 	}
 	return 0;

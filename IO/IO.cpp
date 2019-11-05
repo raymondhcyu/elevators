@@ -193,7 +193,6 @@ void getUserInput(char* input) {
 			else {
 				floor = atoi(&input[1]); // convert character to int
 			}
-
 		}
 		console.Wait();
 		cout << input[1];
