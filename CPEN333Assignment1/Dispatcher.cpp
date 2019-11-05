@@ -13,13 +13,12 @@ struct IODispatch {
 IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
 int E1Message = 0; // message packet to be sent to E1 mailbox
+int startFlag = 0;
 
 CSemaphore messagePacketProducer("MessagePacketProducer", 0);
 CSemaphore messagePacketConsumer("MessagePacketConsumer", 1);
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
-
-int startFlag = 0;
 
 UINT __stdcall Thread1(void* args) {
 
@@ -62,12 +61,19 @@ UINT __stdcall Thread1(void* args) {
 			messagePacket[3] = 0;
 			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
 
+			// Debugging
 			console.Wait();
 			cout << "Message packet content is ";
 			for (auto& mpData : messagePacket) // GCOM magic
 				cout << mpData;
 			cout << endl;
 			console.Signal();
+
+			{ // Dispatch logic ?
+				//console.Wait();
+				//console.Signal();
+			}
+
 			messagePacketProducer.Signal();
 		}
 	}
@@ -85,7 +91,7 @@ UINT __stdcall Thread2(void* args) {
 			E1Message += messagePacket[i];
 		}
 		console.Wait();
-		cout << "Elevator one message: " << E1Message << endl;
+		cout << "Message to elevator one: " << E1Message << endl;
 		console.Signal();
 
 		E1MailProducer.Signal();
@@ -93,6 +99,8 @@ UINT __stdcall Thread2(void* args) {
 	}
 	return 0;
 }
+
+
 
 int main(void) {
 	// Elevator 1 child process
@@ -126,7 +134,7 @@ int main(void) {
 		if (E1Message != 0)
 			p1.Post(E1Message);
 		E1Message = 0; // reset message after sent
-		cout << "Elevator 1 info: " << E1Monitor.getInfoDispatch() << endl;
+		cout << "Received elevator one info: " << E1Monitor.getInfoDispatch() << endl;
 		E1MailConsumer.Signal();
 	}
 
