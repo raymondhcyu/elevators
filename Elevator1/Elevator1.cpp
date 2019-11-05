@@ -29,7 +29,7 @@ int main() {
 
 			cout << __LINE__ << endl;
 
-			// If not a stop command and if difference greater than 0
+			// If not a stop command (later) and if difference greater than 0 move up
 			if (E1Command[4] - E1Current[4] > 0) {
 				E1StartFlag = 1; // not starting anymore since command sent
 				cout << __LINE__ << endl;
@@ -41,18 +41,14 @@ int main() {
 					Sleep(500); // delay to close doors
 					E1Current[3] = 0; // close doors
 					E1Monitor.setInfo(E1Current); // send data
-
-					cout << __LINE__ << endl;
 				}
 				// Check if not moving
 				else if (E1Current[1] == 0) {
 					cout << __LINE__ << endl;
 
-					Sleep(500); // delay to start moving
+					Sleep(500); // delay to start moving up
 					E1Current[1] = 2;
 					E1Monitor.setInfo(E1Current);
-
-					cout << __LINE__ << endl;
 				}
 				// Else increment floor
 				else {
@@ -61,16 +57,45 @@ int main() {
 					Sleep(1000); // delay to move between floors
 					E1Current[4]++;
 					E1Monitor.setInfo(E1Current);
+				}
+			}
+			// If not a stop command (later) and if difference less than 0 move down
+			else if (E1Command[4] - E1Current[4] < 0) {
+				cout << __LINE__ << endl;
 
+				E1StartFlag = 1; // not start anymore since command sent
+
+				// Check if doors open
+				if (E1Current[3] == 1) {
 					cout << __LINE__ << endl;
+
+					Sleep(500); // delay to close doors
+					E1Current[3] = 0; // close doors
+					E1Monitor.setInfo(E1Current); // send data
+				}
+				// Check if not moving
+				else if (E1Current[1] == 0) {
+					cout << __LINE__ << endl;
+
+					Sleep(500); // delay to start moving down
+					E1Current[1] = 1;
+					E1Monitor.setInfo(E1Current);
+				}
+				// Else decrement floor
+				else {
+					cout << __LINE__ << endl;
+
+					Sleep(1000); // delay to move between floors
+					E1Current[4]--;
+					E1Monitor.setInfo(E1Current);
 				}
 			}
 			// If arrived on floor
 			else if ((E1Command[4] == E1Current[4]) && (E1StartFlag != 0)) {
 				cout << __LINE__ << endl;
 
-				// Check if moving up
-				if (E1Current[1] == 2) {
+				// Check if moving up or down to stop moving
+				if ((E1Current[1] == 2) || (E1Current[1] == 1)) {
 					cout << __LINE__ << endl;
 
 					Sleep(500); // delay to stop moving
@@ -94,6 +119,11 @@ int main() {
 				// Send to monitors
 				E1Monitor.setInfo(E1Command);
 			}
+
+			cout << "E1 current is ";
+			for (auto& mpData : E1Current) // GCOM magic
+				cout << mpData;
+			cout << endl;
 			cout << __LINE__ << endl;
 
 		}
