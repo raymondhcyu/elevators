@@ -14,10 +14,14 @@ IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
 int messagePacketPrevious[5] = {}; // previous message packet for comparison
 int E1Message = 0; // message packet to be sent to E1 mailbox
+int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for comparison
+int E1MessageResponse = 0; // update from E1
 int startFlag = 0;
 
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
+CSemaphore E1CompareProducer("E1CompareProducer", 0);
+CSemaphore E1CompareConsumer("E1CompareConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 
@@ -46,7 +50,6 @@ UINT __stdcall Thread1(void* args) {
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 
 	while (1) {
-
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
 			cout << __LINE__ << endl;
@@ -71,7 +74,6 @@ UINT __stdcall Thread1(void* args) {
 
 			cout << __LINE__ << endl;
 
-
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
 			messagePacket[2] = 1;
@@ -90,8 +92,11 @@ UINT __stdcall Thread1(void* args) {
 			// Convert message packet int array to int
 			for (int i = 0; i < 5; i++) {
 				E1Message *= 10;
+				E1MessagePrevious *= 10;
 				E1Message += messagePacket[i];
+				E1MessagePrevious += messagePacket[i];
 			}
+
 			console.Wait();
 			cout << "Message to elevator one: " << E1Message << endl;
 			console.Signal();
@@ -106,7 +111,15 @@ UINT __stdcall Thread2(void* args) {
 	while (1) {
 		cout << __LINE__ << endl;
 
-		cout << "Received elevator one info: " << E1Monitor.getInfoDispatch() << endl;
+		E1MessageResponse = E1Monitor.getInfoDispatch();
+
+		if (E1MessageResponse != E1MessagePrevious) {
+			cout << __LINE__ << endl;
+			E1MailConsumer.Wait(); // produce message for mailbox
+			E1Message = E1MessagePrevious; // send previous message back
+			cout << __LINE__ << endl;
+			E1MailProducer.Signal();
+		}
 
 		cout << __LINE__ << endl;
 	}
@@ -145,8 +158,9 @@ int main(void) {
 
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
-		if (E1Message != 0)
+		if (E1Message != 0) {
 			p1.Post(E1Message);
+		}
 		E1Message = 0; // reset message after sent
 		E1MailConsumer.Signal();
 		cout << __LINE__ << endl;
