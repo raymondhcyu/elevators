@@ -28,7 +28,6 @@ void getUserInput(char* input);
 //Animation function
 void animateElevator(int* status);
 
-
 UINT __stdcall UpdateDisplay(void* args) {
 
 	//create layout for animation
@@ -60,9 +59,7 @@ UINT __stdcall UpdateDisplay(void* args) {
 	MOVE_CURSOR(ANIMATION_TOPLEFT_X + 12, ANIMATION_TOPLEFT_Y - 1);
 	cout << "E2";
 
-
 	console.Signal();
-
 
 	while (1) {
 		// Convert monitor update int to int array for processing
@@ -265,9 +262,4 @@ void animateElevator(int* status) {
 		}
 
 	console.Signal();
-
-
-
-
-
 }
