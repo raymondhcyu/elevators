@@ -6,8 +6,6 @@ TheMonitorOne E1Monitor;
 TheMonitorTwo E2Monitor;
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
-char exitProgram[] = { 'e', 'e', '\0' };
-
 struct IODispatch {
 	char inputs[3];
 };

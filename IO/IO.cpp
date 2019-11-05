@@ -40,18 +40,22 @@ int main() {
 		console.Wait();
 		MOVE_CURSOR(0, 4);
 		cout << "Enter a valid command: ";
+		// @ JASON DO THIS ***********************************************************
+		// Take more inputs like -1 -2 +1 +2 ee
+		// Display correct character inputs if possible instead of uuuuuuu2
 		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 			input[0] = _getch();
 		}
-		while ((input[1] != '2') && (input[1] != 'e')) {
+		while ((input[1] != '2') && (input[1] != '1') && (input[1] != 'e')) {
 			input[1] = _getch();
 		}
+
 		cout << endl;
 		console.Signal();
 
 		dispatchPipeline(input);
 
-		// Convert monitor update to data
+		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO();
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
@@ -59,7 +63,7 @@ int main() {
 		}
 
 		console.Wait();
-		if (E1Status[0] == 1) {
+		if (E1Status[0] == 1) { // 12104
 			MOVE_CURSOR(0, 2);
 
 			switch (E1Status[1]) {
