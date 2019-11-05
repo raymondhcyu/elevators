@@ -19,98 +19,50 @@ struct IODispatch {
 };
 
 int E1Status[5] = {};
+int passengerEnable = 0;
 
 void dispatchPipeline(char* inputs);
 
 //function to get filtered user input from keyboard
 void getUserInput(char* input); 
 
-//Animation function
-void animateElevator(int* status);
+//Animation functions
+void animationElevator(int* status);
+void animationBuildFloorNums(void);
+void animationElevatorControl(int* status);
+void animationCurrentFloor(int* status);
+void animationBuildLabels(void);
+void animationBuildShafts(void);
+void animationCurrentDirection(int* status);
+void animationClearPrevious(int* status);
+void animationUpdateStatusBar(int* status);
+void animationBuildFramework(void);
+
+
 
 UINT __stdcall UpdateDisplay(void* args) {
 
 	//create layout for animation
-	console.Wait();
+	animationBuildFramework();
 
-	//Build elevator shafts
-	for (int i = 0; i <= 10; i++) {
-			
-			MOVE_CURSOR(ANIMATION_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
-			cout << "|";
-			MOVE_CURSOR(ANIMATION_TOPLEFT_X + 8, ANIMATION_TOPLEFT_Y + i);
-			cout << "|";
-			MOVE_CURSOR(ANIMATION_TOPLEFT_X + 16, ANIMATION_TOPLEFT_Y + i);
-			cout << "|";
+	while (1) { // MAIN LOOP
 
-		}
-
-	//Build floor numbers
-	for (int i = 0; i <= 10; i++) {
-
-		MOVE_CURSOR(ANIMATION_TOPLEFT_X-5, ANIMATION_TOPLEFT_Y + i);
-		cout << "F" << 10 - i;
-
-	}
-
-	//Build Labels
-	MOVE_CURSOR(ANIMATION_TOPLEFT_X + 4, ANIMATION_TOPLEFT_Y - 1);
-	cout << "E1";
-	MOVE_CURSOR(ANIMATION_TOPLEFT_X + 12, ANIMATION_TOPLEFT_Y - 1);
-	cout << "E2";
-
-	console.Signal();
-
-	while (1) {
 		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO(); // wait for data?
-
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;
 		}
 
-		console.Wait();
-		if (E1Status[0] == 1) { // 12104
-			MOVE_CURSOR(0, 2);
+		//Update Elevator status bar in realtime
+		animationUpdateStatusBar(E1Status);
 
-			switch (E1Status[1]) {
-			case 2:
-				cout << "Up			";
-				break;
-			case 1:
-				cout << "Down			";
-				break;
-			case 0:
-				cout << "Not moving		";
-				break;
-			}
+		//Animate elevator in relatime
+		animationElevator(E1Status);
 
-			switch (E1Status[2]) {
-			case 0:
-				cout << "Out of service	";
-				break;
-			case 1:
-				cout << "In service		";
-				break;
-			}
-
-			switch (E1Status[3]) {
-			case 0:
-				cout << "Closed			";
-				break;
-			case 1:
-				cout << "Open			";
-				break;
-			}
-
-			cout << E1Status[4];
-		}
-
-		animateElevator(E1Status);
-
-		MOVE_CURSOR(24, 4); // hotfix to move cursor back to input
-		console.Signal();
+		//reset cursor to data entry position
+		MOVE_CURSOR(24, 4); 
+		
 	}
 	return 0;
 }
@@ -185,6 +137,14 @@ void getUserInput(char* input) {
 
 			input[1] = _getch();
 
+			if (input[1] == '+') {
+				passengerEnable = 1;
+			}
+
+			if (input[1] == '-') {
+				passengerEnable = 0;
+			}
+
 			if (atoi(&input[1]) == 0) { //any non numeric character will return 0 via atoi which can be confused with floor number 0
 				if (input[1] == '0') {
 					floor = atoi(&input[1]); // convert character to int
@@ -193,6 +153,7 @@ void getUserInput(char* input) {
 			else {
 				floor = atoi(&input[1]); // convert character to int
 			}
+
 		}
 		console.Wait();
 		cout << input[1];
@@ -220,45 +181,232 @@ void getUserInput(char* input) {
 	Sleep(500); //Delay time for user input to display
 }
 
-void animateElevator(int* status) {
-
-	console.Wait();
+void animationElevator(int* status) {
 
 	//clear previous animation
-		for (int i = 0; i <= 10; i++) {
-			if (status[0] == 1) {
-				MOVE_CURSOR(E1_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
-			}
-			if (status[0] == 2) {
-				MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
+	animationClearPrevious(status);
 
-			}
-			cout << "       ";
-		}
+	//Clear previous floor color
+	animationBuildFloorNums();
 
-		//Display Elevator
+	//Display Elevator & door control
+	animationElevatorControl(status);
+
+	//Indicate Floor Elevator is on
+	animationCurrentFloor(status);
+
+	//Indicate UP or DOWN
+	animationCurrentDirection(status);
+
+}
+
+void animationBuildFloorNums(void) {
+	console.Wait();
+
+	for (int i = 0; i < NUM_FLOORS; i++) {
+
+		MOVE_CURSOR(ANIMATION_TOPLEFT_X - 5, ANIMATION_TOPLEFT_Y + i);
+		SetConsoleTextAttribute(hConsole, GRAY);
+		cout << "F" << (NUM_FLOORS - 1) - i;
+		SetConsoleTextAttribute(hConsole, WHITE);
+
+	}
+
+	console.Signal();
+}
+
+void animationClearPrevious(int* status) {
+	console.Wait();
+
+	for (int i = 0; i < NUM_FLOORS; i++) {
 		if (status[0] == 1) {
-			MOVE_CURSOR(E1_TOPLEFT_X, ANIMATION_TOPLEFT_Y + 10- status[4]);
+			MOVE_CURSOR(E1_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
 		}
 		if (status[0] == 2) {
-			MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + 10- status[4]);
+			MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
+
+		}
+		cout << "       ";
+	}
+
+	console.Signal();
+}
+
+void animationElevatorControl(int* status) {
+	console.Wait();
+
+	int i = 0; 
+
+	while (i < 2) {
+		if (status[0] == 1) {
+			MOVE_CURSOR(E1_TOPLEFT_X, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
+		}
+		if (status[0] == 2) {
+			MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
 		}
 
 		if (status[2] == 0) { //if out of service
 			SetConsoleTextAttribute(hConsole, RED);
 			cout << "[  X  ]";
 			SetConsoleTextAttribute(hConsole, WHITE);
+			i = 2;
 		}
 		if (status[2] == 1) { //if in service: display door open or closed
-			SetConsoleTextAttribute(hConsole, GREEN);
+
 			if (status[3] == 0) {
-				cout << "[  |  ]";
+				if (i == 0) {
+					SetConsoleTextAttribute(hConsole, YELLOW);
+					cout << "[ | | ]";
+					Sleep(500);
+					i++;
+				}
+				else {
+					SetConsoleTextAttribute(hConsole, GREEN);
+					cout << "[  |  ]";
+					i++;
+				}
 			}
 			if (status[3] == 1) {
-				cout << "[|   |]";
+				SetConsoleTextAttribute(hConsole, YELLOW);
+				if (i == 0) {
+					
+					cout << "[ | | ]";
+					Sleep(500);
+					i++;
+				}
+				else {
+					cout << "[|   |]";
+					i++;
+				}
 			}
 			SetConsoleTextAttribute(hConsole, WHITE);
 		}
+	}
 
 	console.Signal();
+}
+
+void animationCurrentFloor(int* status) {
+	console.Wait();
+
+	MOVE_CURSOR(ANIMATION_TOPLEFT_X - 5, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
+	SetConsoleTextAttribute(hConsole, WHITE);
+	cout << "F" << status[4];
+
+	console.Signal();
+}
+
+void animationBuildLabels(void) {
+	console.Wait();
+
+	MOVE_CURSOR(ANIMATION_TOPLEFT_X + 4, ANIMATION_TOPLEFT_Y - 1);
+	cout << "E1";
+	MOVE_CURSOR(ANIMATION_TOPLEFT_X + 12, ANIMATION_TOPLEFT_Y - 1);
+	cout << "E2";
+
+	console.Signal();
+}
+
+void animationBuildShafts(void) {
+	console.Wait();
+
+	for (int i = 0; i < NUM_FLOORS; i++) {
+
+
+		MOVE_CURSOR(ANIMATION_TOPLEFT_X, ANIMATION_TOPLEFT_Y + i);
+		cout << "|";
+		MOVE_CURSOR(ANIMATION_TOPLEFT_X + 8, ANIMATION_TOPLEFT_Y + i);
+		cout << "|";
+		MOVE_CURSOR(ANIMATION_TOPLEFT_X + 16, ANIMATION_TOPLEFT_Y + i);
+		cout << "|";
+
+	}
+
+	console.Signal();
+}
+
+void animationUpdateStatusBar(int* status) {
+	console.Wait();
+	if (E1Status[0] == 1) { // 12104
+		MOVE_CURSOR(0, 2);
+
+		switch (E1Status[1]) {
+		case 2:
+			cout << "Up			";
+			break;
+		case 1:
+			cout << "Down			";
+			break;
+		case 0:
+			cout << "Not moving		";
+			break;
+		}
+
+		switch (E1Status[2]) {
+		case 0:
+			cout << "Out of service	";
+			break;
+		case 1:
+			cout << "In service		";
+			break;
+		}
+
+		switch (E1Status[3]) {
+		case 0:
+			cout << "Closed			";
+			break;
+		case 1:
+			cout << "Open			";
+			break;
+		}
+
+		cout << E1Status[4];
+	}
+
+	console.Signal();
+}
+
+void animationCurrentDirection(int* status) {
+	console.Wait();
+
+	int offset = 0;
+	char string = ' ';
+
+	if (status[0] == 1) { //E1
+		offset = 3;
+	}
+	if (status[0] == 2) { //E2
+		offset = 11;
+	}
+
+	if (status[1] == 1) { //If going down
+		string = 'DOWN';
+	}
+	if (status[1] == 2) { //If going up
+		string = ' UP ';
+	}
+	MOVE_CURSOR(ANIMATION_TOPLEFT_X + offset, ANIMATION_TOPLEFT_Y - 2);
+	SetConsoleTextAttribute(hConsole, YELLOW);
+	cout << string;
+	SetConsoleTextAttribute(hConsole, WHITE);
+
+	console.Signal();
+}
+
+void animationBuildFramework(void) {
+	//Build elevator shafts
+	animationBuildShafts();
+	//Build floor numbers
+	animationBuildFloorNums();
+	//Build Labels
+	animationBuildLabels();
+}
+
+void animatePeople(int* status, int* people) {
+
+	console.Wait();
+
+
+	console.Signal();
+
 }
