@@ -54,7 +54,7 @@ UINT __stdcall Thread1(void* args) {
 
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 			
-			// Up or down commands only
+			// Up or down commands only 
 			messagePacketConsumer.Wait();
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
