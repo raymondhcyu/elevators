@@ -17,7 +17,7 @@ int E1Status[5] = {};
 
 void dispatchPipeline(char* inputs);
 
-UINT __stdcall Thread1(void* args) {
+UINT __stdcall UpdateDisplay(void* args) {
 	while (1) {
 		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO(); // wait for data?
@@ -77,7 +77,7 @@ int main() {
 	r1.Wait();
 	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
 
-	CThread t1(Thread1, ACTIVE, NULL);
+	CThread t1(UpdateDisplay, ACTIVE, NULL);
 
 	while (1) {
 		// Get user input (move to separate function later)
