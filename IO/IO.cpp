@@ -27,6 +27,8 @@ UINT __stdcall Thread1(void* args) {
 			E1Update /= 10;
 		}
 
+		// @ JASON DO THIS ***********************************************************
+		// Add animations here in this thread
 		console.Wait();
 		if (E1Status[0] == 1) { // 12104
 			MOVE_CURSOR(0, 2);
