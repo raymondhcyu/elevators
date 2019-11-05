@@ -27,12 +27,17 @@ UINT __stdcall Thread1(void* args) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
 
+			// Debugging
+			console.Wait();
 			std::cout << "Received " << pipeIOData.inputs << endl;
+			console.Signal();
+
 			if (pipeIOData.inputs[0] == 'e') {
-				console.Wait();
-				cout << "Program should exit now" << endl;
-				console.Signal();
+				//console.Wait();
+				//cout << "Program should exit now..." << endl;
+				//console.Signal();
 			}
+
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 			
 			// Up or down commands only

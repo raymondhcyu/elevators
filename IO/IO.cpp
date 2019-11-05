@@ -16,22 +16,24 @@ struct IODispatch {
 int E1Status[5] = {};
 
 void dispatchPipeline(char* inputs);
-void displayUpdates();
 
-UINT __stdcall Thread1(void* args) {
-	//console.Wait();
-	//MOVE_CURSOR(0, 7);
-	//cout << "Elevator 1 info: " << E1Monitor.getInfoIO() << endl;
-	//console.Signal();
-	return 0;
-}
+int startFlag = 0; // flag for activities to start only at beginning of program
 
 int main() {
 	// Rendezvous to start
 	r1.Wait();
 	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
 
-	CThread t1(Thread1, ACTIVE, NULL);
+	if (startFlag == 0) { // start condition
+		console.Wait();
+		MOVE_CURSOR(0, 2);
+		cout << "Not moving		";
+		cout << "In service		";
+		cout << "Open			";
+		cout << 0;
+		startFlag == 1;
+		console.Signal();
+	}
 
 	while (1) {
 		// Get user input (move to separate function later)
@@ -46,10 +48,9 @@ int main() {
 		while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e')) {
 			input[0] = _getch();
 		}
-		while ((input[1] != '2') && (input[1] != '1') && (input[1] != 'e')) {
+		while ((input[1] != '2') && (input[1] != '1') && (input[1] != '0') && (input[1] != 'e')) {
 			input[1] = _getch();
 		}
-
 		cout << endl;
 		console.Signal();
 
@@ -101,7 +102,6 @@ int main() {
 		console.Signal();
 	}
 
-	t1.WaitForThread();
 	return 0;
 }
 
@@ -112,6 +112,4 @@ void dispatchPipeline(char* userInput) {
 	strcpy(dispatch.inputs, userInput); // copy input to struct, change to receive user input later
 
 	PipeIODispatch.Write(&dispatch);
-	//cout << "Dispatch pipeline has " << PipeIODispatch.TestForData() << " units of data" << endl;
-	//cout << "IO wrote " << dispatch.inputs << " to dispatch pipeline!" << endl;
 }
