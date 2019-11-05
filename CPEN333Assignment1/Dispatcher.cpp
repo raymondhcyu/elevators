@@ -16,22 +16,30 @@ int messagePacketPrevious[5] = {}; // previous message packet for comparison
 int E1Message = 0; // message packet to be sent to E1 mailbox
 int startFlag = 0;
 
-CSemaphore messagePacketProducer("MessagePacketProducer", 0);
-CSemaphore messagePacketConsumer("MessagePacketConsumer", 1);
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 
-	if (startFlag == 0) { // only happens once, sends start command to elevator once entire process starts
-		messagePacketConsumer.Wait();
+	// Start elevators only happens once, sends start command to elevator once entire process starts
+	// Initialize on floor 0 doors open
+	if (startFlag == 0) { 
+		E1MailConsumer.Wait(); // produce message for mailbox
 		// 10110
 		messagePacket[0] = 1;
 		messagePacket[1] = 0;
 		messagePacket[2] = 1;
 		messagePacket[3] = 1;
 		messagePacket[4] = 0;
-		messagePacketProducer.Signal();
+
+		// Convert message packet int array to int
+		for (int i = 0; i < 5; i++) {
+			E1Message *= 10;
+			E1Message += messagePacket[i];
+		}
+
+		// Signal to mailbox that ready to send
+		E1MailProducer.Signal();
 		startFlag = 1;
 	}
 
@@ -55,27 +63,32 @@ UINT __stdcall Thread1(void* args) {
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
 			
 			// Up or down commands only 
-			messagePacketConsumer.Wait();
+			E1MailConsumer.Wait(); // produce message for mailbox
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
 			messagePacket[2] = 1;
 			messagePacket[3] = 0;
 			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
 
-			// Debugging
+			//{// Debugging
+			//	console.Wait();
+			//	cout << "Message packet content is ";
+			//	for (auto& mpData : messagePacket) // GCOM magic
+			//		cout << mpData;
+			//	cout << endl;
+			//	console.Signal();
+			//}
+
+			// Convert message packet int array to int
+			for (int i = 0; i < 5; i++) {
+				E1Message *= 10;
+				E1Message += messagePacket[i];
+			}
 			console.Wait();
-			cout << "Message packet content is ";
-			for (auto& mpData : messagePacket) // GCOM magic
-				cout << mpData;
-			cout << endl;
+			cout << "Message to elevator one: " << E1Message << endl;
 			console.Signal();
 
-			{ // Dispatch logic ?
-				//console.Wait();
-				//console.Signal();
-			}
-
-			messagePacketProducer.Signal();
+			E1MailProducer.Signal();
 		}
 	}
 	return 0;
@@ -83,20 +96,7 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 	while (1) {
-		messagePacketProducer.Wait(); // consume message from pipeline
-		E1MailConsumer.Wait(); // produce message for mailbox
 
-		// Convert message packet int array to int
-		for (int i = 0; i < 5; i++) {
-			E1Message *= 10;
-			E1Message += messagePacket[i];
-		}
-		console.Wait();
-		cout << "Message to elevator one: " << E1Message << endl;
-		console.Signal();
-
-		E1MailProducer.Signal();
-		messagePacketConsumer.Signal();
 	}
 	return 0;
 }
@@ -122,7 +122,7 @@ int main(void) {
 	);
 
 	CThread t1(Thread1, ACTIVE, NULL);
-	CThread t2(Thread2, ACTIVE, NULL);
+	//CThread t2(Thread2, ACTIVE, NULL);
 
 	// Rendezvous to start processes together
 	r1.Wait();
@@ -144,7 +144,7 @@ int main(void) {
 	}
 
 	t1.WaitForThread();
-	t2.WaitForThread();
+	//t2.WaitForThread();
 
 	p1.WaitForProcess();
 	p2.WaitForProcess();
