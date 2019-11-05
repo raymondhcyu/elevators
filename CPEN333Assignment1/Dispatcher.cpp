@@ -12,6 +12,7 @@ struct IODispatch {
 
 IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
+int messagePacketPrevious[5] = {}; // previous message packet for comparison
 int E1Message = 0; // message packet to be sent to E1 mailbox
 int startFlag = 0;
 
@@ -100,8 +101,6 @@ UINT __stdcall Thread2(void* args) {
 	return 0;
 }
 
-
-
 int main(void) {
 	// Elevator 1 child process
 	CProcess p1("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\Elevator1.exe",
@@ -130,11 +129,17 @@ int main(void) {
 	cout << "Dispatcher initializing..." << endl;
 
 	while (1) {
+
 		E1MailProducer.Wait();
+
+		// If getinfodispatch != prev command send out again
+
 		if (E1Message != 0)
 			p1.Post(E1Message);
 		E1Message = 0; // reset message after sent
+
 		cout << "Received elevator one info: " << E1Monitor.getInfoDispatch() << endl;
+
 		E1MailConsumer.Signal();
 	}
 
