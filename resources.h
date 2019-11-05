@@ -16,6 +16,8 @@ Debugging tip: "Sprinkle print lines"
 #ifndef __resources__
 #define __resources__
 
+#define NUM_FLOORS 10
+
 #define ANIMATION_TOPLEFT_X 10
 #define ANIMATION_TOPLEFT_Y 10
 #define E1_TOPLEFT_X 11
@@ -28,6 +30,7 @@ Debugging tip: "Sprinkle print lines"
 #define BLUE 1
 #define PURPLE 5
 #define WHITE 7 
+#define GRAY 8
 
 
 
