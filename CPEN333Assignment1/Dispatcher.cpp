@@ -53,7 +53,6 @@ UINT __stdcall Thread1(void* args) {
 	while (1) {
 		if (PipeIODispatch.TestForData() >= sizeof(pipeIOData) / 3) { // size of struct is 3
 			PipeIODispatch.Read(&pipeIOData);
-			cout << __LINE__ << endl;
 
 			// Debugging
 			console.Wait();
@@ -68,13 +67,9 @@ UINT __stdcall Thread1(void* args) {
 			}
 
 			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
-			
-			cout << __LINE__ << endl;
 
 			// Up or down commands only 
 			E1MailConsumer.Wait(); // produce message for mailbox
-
-			cout << __LINE__ << endl;
 
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
@@ -101,14 +96,6 @@ UINT __stdcall Thread1(void* args) {
 				E1MessagePrevious += messagePacket[i];
 			}
 
-			// Append inputs to an array for comparison
-			for (int i = 0; i < 99; i++) {
-				if (someArray[i] == 0) {
-					someArray[i] = E1Message;
-					break;
-				}
-			}
-
 			console.Wait();
 			cout << "Message to elevator one: " << E1Message << endl;
 			console.Signal();
@@ -121,18 +108,7 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 	while (1) {
-		cout << __LINE__ << endl;
-
 		E1MessageResponse = E1Monitor.getInfoDispatch();
-
-		// someArray[100] exists here
-
-		for (int i = 0; i < 99; i++) {
-			if (someArray[i] != 0) {
-				E1MessagePrevious = someArray[i];
-				cout << "someArray content: " << someArray[i] << endl;
-			}
-		}
 
 		console.Wait();
 		cout << "E1 Message response: " << E1MessageResponse << endl;
@@ -141,10 +117,8 @@ UINT __stdcall Thread2(void* args) {
 
 		// Add one time marker?
 		if (E1MessageResponse != E1MessagePrevious) {
-			cout << __LINE__ << endl;
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious; // send previous message back
-			cout << __LINE__ << endl;
 			E1MailProducer.Signal();
 			doorFlag = 1;
 		}
@@ -154,8 +128,6 @@ UINT __stdcall Thread2(void* args) {
 			E1MailProducer.Signal();
 			doorFlag = 0; // reset door flag
 		}
-
-		cout << __LINE__ << endl;
 	}
 	return 0;
 }
@@ -188,7 +160,6 @@ int main(void) {
 	cout << "Dispatcher initializing..." << endl;
 
 	while (1) {
-		cout << __LINE__ << endl;
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
 		if (E1Message != 0) {
@@ -196,7 +167,6 @@ int main(void) {
 		}
 		E1Message = 0; // reset message after sent
 		E1MailConsumer.Signal();
-		cout << __LINE__ << endl;
 	}
 
 	t1.WaitForThread();
