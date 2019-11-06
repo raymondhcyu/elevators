@@ -19,6 +19,8 @@ int E1MessageResponse = 0; // update from E1
 int startFlag = 0; // start flag to initialize elevator
 int doorFlag = 0; // flag to send message again to E1
 
+int someArray[100] = {}; // store all commands in here brute forced
+
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
@@ -99,6 +101,14 @@ UINT __stdcall Thread1(void* args) {
 				E1MessagePrevious += messagePacket[i];
 			}
 
+			// Append inputs to an array for comparison
+			for (int i = 0; i < 99; i++) {
+				if (someArray[i] == 0) {
+					someArray[i] = E1Message;
+					break;
+				}
+			}
+
 			console.Wait();
 			cout << "Message to elevator one: " << E1Message << endl;
 			console.Signal();
@@ -114,6 +124,15 @@ UINT __stdcall Thread2(void* args) {
 		cout << __LINE__ << endl;
 
 		E1MessageResponse = E1Monitor.getInfoDispatch();
+
+		// someArray[100] exists here
+
+		for (int i = 0; i < 99; i++) {
+			if (someArray[i] != 0) {
+				E1MessagePrevious = someArray[i];
+				cout << "someArray content: " << someArray[i] << endl;
+			}
+		}
 
 		console.Wait();
 		cout << "E1 Message response: " << E1MessageResponse << endl;
