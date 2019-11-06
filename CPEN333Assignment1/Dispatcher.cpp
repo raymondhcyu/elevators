@@ -128,7 +128,6 @@ UINT __stdcall Thread2(void* args) {
 
 		if (someArray[i] != 0) {
 			E1MessagePrevious = someArray[i];
-			cout << __LINE__ << endl;
 			secondFlag = 0;
 		}
 		else if (doorFlag == 0) { // only happen once
@@ -137,23 +136,15 @@ UINT __stdcall Thread2(void* args) {
 		}
 		// Else previous message = previous message
 
-		cout << __LINE__ << "\t";
-		for (int j = 0; j < 99; j++) {
-			if (someArray[j] != 0)
-				cout << someArray[j];
-		}
-		cout << endl;
-
 		cout << __LINE__ << endl;
 		E1MessageResponse = E1Monitor.getInfoDispatch();
-		cout << __LINE__ << endl;
 
 		{console.Wait();
 		cout << "E1 Message response: " << E1MessageResponse << endl;
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
-		// Check if elevator done; -2000 checks motion, +10 checks door
+		// Check if elevator done; -2000 or -1000 checks motion, +10 checks door
 		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (secondFlag == 0)) {
 			i++;
 			console.Wait();
@@ -166,11 +157,21 @@ UINT __stdcall Thread2(void* args) {
 			E1MailProducer.Signal();
 			secondFlag = 1;
 		}
-		else {
+		else if (((E1MessagePrevious - 990) == E1MessageResponse) && (secondFlag == 0)) {
+			i++;
+			console.Wait();
+			cout << "Value of i is " << i << endl;
+			console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
 
-			E1Message = E1MessagePrevious;
+			E1Message = E1MessagePrevious - 990;
 
+			E1MailProducer.Signal();
+			secondFlag = 1;
+		}
+		else {
+			E1MailConsumer.Wait(); // produce message for mailbox
+			E1Message = E1MessagePrevious;
 			E1MailProducer.Signal();
 		}
 
