@@ -13,6 +13,8 @@ struct IODispatch {
 IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
 int E1Message = 0; // message packet to be sent to E1 mailbox
+int E1MessageFromPipe = 0;
+
 int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for comparison
 int E1MessageResponse = 0; // update from E1
 
@@ -25,6 +27,7 @@ CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
+	int i = 0;
 
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 
@@ -33,10 +36,9 @@ UINT __stdcall Thread1(void* args) {
 			PipeIODispatch.Read(&pipeIOData);
 
 			// Debugging
-			console.Wait();
+			{console.Wait();
 			std::cout << "Received " << pipeIOData.inputs << endl;
-			
-			console.Signal();
+			console.Signal(); }
 
 			if (pipeIOData.inputs[0] == 'e') {
 				//console.Wait();
@@ -44,10 +46,10 @@ UINT __stdcall Thread1(void* args) {
 				//console.Signal();
 			}
 
-			std::unordered_map<char, int> commandReference { {'u', 2}, {'d', 1} }; // GCOM magic
+			std::unordered_map<char, int> commandReference{ {'u', 2}, {'d', 1} }; // GCOM magic
 
 			// Up or down commands only 
-			E1MailConsumer.Wait(); // produce message for mailbox
+			//E1MailConsumer.Wait(); // produce message for mailbox
 
 			messagePacket[0] = 1;
 			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
@@ -64,31 +66,45 @@ UINT __stdcall Thread1(void* args) {
 			//	console.Signal();
 			//}
 
-			E1MessagePrevious = 0; // reset previous message since command complete
+			//E1MessagePrevious = 0; // reset previous message since command complete
 
 			// Convert message packet int array to int
-			for (int i = 0; i < 5; i++) {
-				E1Message *= 10;
-				E1MessagePrevious *= 10;
-				E1Message += messagePacket[i];
-				E1MessagePrevious += messagePacket[i];
+			for (int j = 0; j < 5; j++) {
+				E1MessageFromPipe *= 10;
+				//E1MessagePrevious *= 10;
+				E1MessageFromPipe += messagePacket[j];
+				//E1MessagePrevious += messagePacket[j];
 			}
 
+			someArray[i] = E1MessageFromPipe;
+			cout << __LINE__ << "\t";
+			for (int j = 0; j < 99; j++) {
+				if (someArray[j] != 0)
+					cout << someArray[j];
+			}
+			cout << endl;
+			i++;
+
 			console.Wait();
-			cout << "Message to elevator one: " << E1Message << endl;
+			cout << "Message to elevator one: " << E1MessageFromPipe << endl;
 			console.Signal();
 
-			E1MailProducer.Signal();
+			E1MessageFromPipe = 0; // reset pipeline message after sent
+
+			//E1MailProducer.Signal();
 		}
 	}
 	return 0;
 }
 
 UINT __stdcall Thread2(void* args) {
+	int i = 0;
+
 	while (1) {
 		// Start elevators only happens once, sends start command to elevator once entire process starts
 		// Initialize on floor 0 doors open
 		if (startFlag == 0) {
+
 			E1MailConsumer.Wait(); // produce message for mailbox
 			// 10110
 			messagePacket[0] = 1;
@@ -98,9 +114,9 @@ UINT __stdcall Thread2(void* args) {
 			messagePacket[4] = 0;
 
 			// Convert message packet int array to int
-			for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
 				E1Message *= 10;
-				E1Message += messagePacket[i];
+				E1Message += messagePacket[j];
 			}
 
 			// Signal to mailbox that ready to send
@@ -108,26 +124,56 @@ UINT __stdcall Thread2(void* args) {
 			startFlag = 1;
 		}
 
-		E1MessageResponse = E1Monitor.getInfoDispatch();
+		if (someArray[i] != 0) {
+			E1MessagePrevious = someArray[i];
+			cout << __LINE__ << endl;
+		}
 
-		console.Wait();
+		cout << __LINE__ << "\t";
+		for (int j = 0; j < 99; j++) {
+			if (someArray[j] != 0)
+				cout << someArray[j];
+		}
+		cout << endl;
+
+		cout << __LINE__ << endl;
+		E1MessageResponse = E1Monitor.getInfoDispatch();
+		cout << __LINE__ << endl;
+
+		// Check if elevator done; -2000 checks motion, +10 checks door
+		if ((E1MessagePrevious - 1990) == E1MessageResponse) {
+			cout << __LINE__ << endl;
+
+			i++;
+			E1MessagePrevious = someArray[i];
+		}
+
+		{console.Wait();
 		cout << "E1 Message response: " << E1MessageResponse << endl;
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
-		console.Signal();
+		console.Signal(); }
 
-		// Add one time marker?
+		cout << __LINE__ << endl;
+
 		if (E1MessageResponse != E1MessagePrevious) {
+			cout << __LINE__ << endl;
 			E1MailConsumer.Wait(); // produce message for mailbox
+			cout << __LINE__ << endl;
 			E1Message = E1MessagePrevious; // send previous message back
+			if (E1Message == 0)
+				E1Message = 10110; // otherwise message won't be sent through mailbox
 			E1MailProducer.Signal();
 			doorFlag = 1;
+
 		}
 		else if (doorFlag == 1) {
+			cout << __LINE__ << endl;
 			E1MailConsumer.Wait();
 			E1Message = E1MessagePrevious; // send previous message back one more time to open doors
 			E1MailProducer.Signal();
 			doorFlag = 0; // reset door flag
 		}
+		cout << __LINE__ << endl;
 	}
 	return 0;
 }
