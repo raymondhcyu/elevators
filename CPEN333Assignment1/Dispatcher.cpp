@@ -19,10 +19,10 @@ int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for com
 int E1MessageResponse = 0; // update from E1
 
 int startFlag = 0; // start flag to initialize elevator
-int doorFlag = 0; // flag to send message again to E1
-int secondFlag = 0;
+int arrayStartFlag = 0; // flag to send message again to E1
+int arrayIncrementFlag = 0;
 
-int someArray[100] = {}; // store all commands in here brute forced
+int someArray[100] = {}; // store all commands in here brute forced; can dynamically allocate for longer runtime
 
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
@@ -128,11 +128,11 @@ UINT __stdcall Thread2(void* args) {
 
 		if (someArray[i] != 0) {
 			E1MessagePrevious = someArray[i];
-			secondFlag = 0;
+			arrayIncrementFlag = 0;
 		}
-		else if (doorFlag == 0) { // only happen once
+		else if (arrayStartFlag == 0) { // only happen once 
 			E1MessagePrevious = 10110;
-			doorFlag = 1;
+			arrayStartFlag = 1;
 		}
 		// Else previous message = previous message
 
@@ -146,7 +146,7 @@ UINT __stdcall Thread2(void* args) {
 
 		// Check if elevator done; -2000 checks up motion, +10 checks door
 		// E.g. command - 1990 = elevator arrived on target floor stopped, and doors open
-		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (secondFlag == 0)) {
+		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
@@ -154,11 +154,11 @@ UINT __stdcall Thread2(void* args) {
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious - 1990;
 			E1MailProducer.Signal();
-			secondFlag = 1;
+			arrayIncrementFlag = 1;
 		}
 		// Check if elevator done; -1000 checks down motion, +10 checks door
 		// E.g. command - 990 = elevator arrived on target floor stopped, and doors open
-		else if (((E1MessagePrevious - 990) == E1MessageResponse) && (secondFlag == 0)) {
+		else if (((E1MessagePrevious - 990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
@@ -166,7 +166,7 @@ UINT __stdcall Thread2(void* args) {
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious - 990;
 			E1MailProducer.Signal();
-			secondFlag = 1;
+			arrayIncrementFlag = 1;
 		}
 		else {
 			E1MailConsumer.Wait(); // produce message for mailbox
