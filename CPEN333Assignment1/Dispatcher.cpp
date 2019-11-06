@@ -12,7 +12,6 @@ struct IODispatch {
 
 IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
-int messagePacketPrevious[5] = {}; // previous message packet for comparison
 int E1Message = 0; // message packet to be sent to E1 mailbox
 int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for comparison
 int E1MessageResponse = 0; // update from E1
@@ -57,6 +56,7 @@ UINT __stdcall Thread1(void* args) {
 			// Debugging
 			console.Wait();
 			std::cout << "Received " << pipeIOData.inputs << endl;
+			
 			console.Signal();
 
 			if (pipeIOData.inputs[0] == 'e') {
