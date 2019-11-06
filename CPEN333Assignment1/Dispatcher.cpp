@@ -20,6 +20,7 @@ int E1MessageResponse = 0; // update from E1
 
 int startFlag = 0; // start flag to initialize elevator
 int doorFlag = 0; // flag to send message again to E1
+int secondFlag = 0;
 
 int someArray[100] = {}; // store all commands in here brute forced
 
@@ -104,6 +105,7 @@ UINT __stdcall Thread2(void* args) {
 		// Start elevators only happens once, sends start command to elevator once entire process starts
 		// Initialize on floor 0 doors open
 		if (startFlag == 0) {
+			cout << __LINE__ << endl;
 
 			E1MailConsumer.Wait(); // produce message for mailbox
 			// 10110
@@ -127,7 +129,13 @@ UINT __stdcall Thread2(void* args) {
 		if (someArray[i] != 0) {
 			E1MessagePrevious = someArray[i];
 			cout << __LINE__ << endl;
+			secondFlag = 0;
 		}
+		else if (doorFlag == 0) { // only happen once
+			E1MessagePrevious = 10110;
+			doorFlag = 1;
+		}
+		// Else previous message = previous message
 
 		cout << __LINE__ << "\t";
 		for (int j = 0; j < 99; j++) {
@@ -140,40 +148,55 @@ UINT __stdcall Thread2(void* args) {
 		E1MessageResponse = E1Monitor.getInfoDispatch();
 		cout << __LINE__ << endl;
 
-		// Check if elevator done; -2000 checks motion, +10 checks door
-		if ((E1MessagePrevious - 1990) == E1MessageResponse) {
-			cout << __LINE__ << endl;
-
-			i++;
-			E1MessagePrevious = someArray[i];
-		}
-
 		{console.Wait();
 		cout << "E1 Message response: " << E1MessageResponse << endl;
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
-		cout << __LINE__ << endl;
-
-		if (E1MessageResponse != E1MessagePrevious) {
-			cout << __LINE__ << endl;
+		// Check if elevator done; -2000 checks motion, +10 checks door
+		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (secondFlag == 0)) {
+			i++;
+			console.Wait();
+			cout << "Value of i is " << i << endl;
+			console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
-			cout << __LINE__ << endl;
-			E1Message = E1MessagePrevious; // send previous message back
-			if (E1Message == 0)
-				E1Message = 10110; // otherwise message won't be sent through mailbox
-			E1MailProducer.Signal();
-			doorFlag = 1;
 
-		}
-		else if (doorFlag == 1) {
-			cout << __LINE__ << endl;
-			E1MailConsumer.Wait();
-			E1Message = E1MessagePrevious; // send previous message back one more time to open doors
+			E1Message = E1MessagePrevious - 1990;
+
 			E1MailProducer.Signal();
-			doorFlag = 0; // reset door flag
+			secondFlag = 1;
 		}
+		else {
+			E1MailConsumer.Wait(); // produce message for mailbox
+
+			E1Message = E1MessagePrevious;
+
+			E1MailProducer.Signal();
+		}
+
 		cout << __LINE__ << endl;
+
+		//if (E1MessageResponse != E1MessagePrevious) {
+		//	cout << __LINE__ << endl;
+		//	E1MailConsumer.Wait(); // produce message for mailbox
+		//	cout << __LINE__ << endl;
+
+		//	if (E1MessagePrevious == 0)
+		//		E1MessagePrevious = 10110; // otherwise message won't be sent through mailbox
+
+		//	E1Message = E1MessagePrevious; // send previous message back
+
+		//	E1MailProducer.Signal();
+		//	doorFlag = 1;
+		//}
+		//else if (doorFlag == 1) {
+		//	cout << __LINE__ << endl;
+		//	E1MailConsumer.Wait();
+		//	E1Message = E1MessagePrevious; // send previous message back one more time to open doors
+		//	E1MailProducer.Signal();
+		//	doorFlag = 0; // reset door flag
+		//}
+		//cout << __LINE__ << endl;
 	}
 	return 0;
 }
@@ -209,6 +232,9 @@ int main(void) {
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
 		if (E1Message != 0) {
+			console.Wait();
+			cout << "Sending " << E1Message << endl;
+			console.Signal();
 			p1.Post(E1Message);
 		}
 		E1Message = 0; // reset message after sent

@@ -110,6 +110,8 @@ int main() {
 					E1Current[3] = 1;
 					E1Monitor.setInfo(E1Current);
 				}
+				else // condition where it stopped on destination floor and doors open
+					E1Monitor.setInfo(E1Current);
 			}
 
 			// Only time this should be triggered is first time
