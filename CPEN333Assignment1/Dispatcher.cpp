@@ -136,36 +136,35 @@ UINT __stdcall Thread2(void* args) {
 		}
 		// Else previous message = previous message
 
-		cout << __LINE__ << endl;
 		E1MessageResponse = E1Monitor.getInfoDispatch();
 
 		{console.Wait();
+		cout << endl;
 		cout << "E1 Message response: " << E1MessageResponse << endl;
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
-		// Check if elevator done; -2000 or -1000 checks motion, +10 checks door
+		// Check if elevator done; -2000 checks up motion, +10 checks door
+		// E.g. command - 1990 = elevator arrived on target floor stopped, and doors open
 		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (secondFlag == 0)) {
 			i++;
-			console.Wait();
-			cout << "Value of i is " << i << endl;
-			console.Signal();
+			//console.Wait();
+			//cout << "Value of i is " << i << endl;
+			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
-
 			E1Message = E1MessagePrevious - 1990;
-
 			E1MailProducer.Signal();
 			secondFlag = 1;
 		}
+		// Check if elevator done; -1000 checks down motion, +10 checks door
+		// E.g. command - 990 = elevator arrived on target floor stopped, and doors open
 		else if (((E1MessagePrevious - 990) == E1MessageResponse) && (secondFlag == 0)) {
 			i++;
-			console.Wait();
-			cout << "Value of i is " << i << endl;
-			console.Signal();
+			//console.Wait();
+			//cout << "Value of i is " << i << endl;
+			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
-
 			E1Message = E1MessagePrevious - 990;
-
 			E1MailProducer.Signal();
 			secondFlag = 1;
 		}
@@ -174,30 +173,6 @@ UINT __stdcall Thread2(void* args) {
 			E1Message = E1MessagePrevious;
 			E1MailProducer.Signal();
 		}
-
-		cout << __LINE__ << endl;
-
-		//if (E1MessageResponse != E1MessagePrevious) {
-		//	cout << __LINE__ << endl;
-		//	E1MailConsumer.Wait(); // produce message for mailbox
-		//	cout << __LINE__ << endl;
-
-		//	if (E1MessagePrevious == 0)
-		//		E1MessagePrevious = 10110; // otherwise message won't be sent through mailbox
-
-		//	E1Message = E1MessagePrevious; // send previous message back
-
-		//	E1MailProducer.Signal();
-		//	doorFlag = 1;
-		//}
-		//else if (doorFlag == 1) {
-		//	cout << __LINE__ << endl;
-		//	E1MailConsumer.Wait();
-		//	E1Message = E1MessagePrevious; // send previous message back one more time to open doors
-		//	E1MailProducer.Signal();
-		//	doorFlag = 0; // reset door flag
-		//}
-		//cout << __LINE__ << endl;
 	}
 	return 0;
 }
@@ -233,9 +208,6 @@ int main(void) {
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
 		if (E1Message != 0) {
-			console.Wait();
-			cout << "Sending " << E1Message << endl;
-			console.Signal();
 			p1.Post(E1Message);
 		}
 		E1Message = 0; // reset message after sent

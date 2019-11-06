@@ -116,7 +116,7 @@ int main() {
 
 			// Only time this should be triggered is first time
 			else {
-				cout << __LINE__ << endl;
+				//cout << __LINE__ << endl;
 
 				// Send to monitors
 				E1Monitor.setInfo(E1Command);
