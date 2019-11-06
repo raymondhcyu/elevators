@@ -26,28 +26,6 @@ CSemaphore E1MailConsumer("E1MailConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 
-	// Start elevators only happens once, sends start command to elevator once entire process starts
-	// Initialize on floor 0 doors open
-	if (startFlag == 0) { 
-		E1MailConsumer.Wait(); // produce message for mailbox
-		// 10110
-		messagePacket[0] = 1;
-		messagePacket[1] = 0;
-		messagePacket[2] = 1;
-		messagePacket[3] = 1;
-		messagePacket[4] = 0;
-
-		// Convert message packet int array to int
-		for (int i = 0; i < 5; i++) {
-			E1Message *= 10;
-			E1Message += messagePacket[i];
-		}
-
-		// Signal to mailbox that ready to send
-		E1MailProducer.Signal();
-		startFlag = 1;
-	}
-
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100); // room for 100 data
 
 	while (1) {
@@ -108,6 +86,28 @@ UINT __stdcall Thread1(void* args) {
 
 UINT __stdcall Thread2(void* args) {
 	while (1) {
+		// Start elevators only happens once, sends start command to elevator once entire process starts
+		// Initialize on floor 0 doors open
+		if (startFlag == 0) {
+			E1MailConsumer.Wait(); // produce message for mailbox
+			// 10110
+			messagePacket[0] = 1;
+			messagePacket[1] = 0;
+			messagePacket[2] = 1;
+			messagePacket[3] = 1;
+			messagePacket[4] = 0;
+
+			// Convert message packet int array to int
+			for (int i = 0; i < 5; i++) {
+				E1Message *= 10;
+				E1Message += messagePacket[i];
+			}
+
+			// Signal to mailbox that ready to send
+			E1MailProducer.Signal();
+			startFlag = 1;
+		}
+
 		E1MessageResponse = E1Monitor.getInfoDispatch();
 
 		console.Wait();
