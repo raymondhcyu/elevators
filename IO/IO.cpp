@@ -289,8 +289,10 @@ void animationElevatorControl(int* status) {
 					i++;
 				}
 			}
-			SetConsoleTextAttribute(hConsole, WHITE);
+			
 		}
+		
+		SetConsoleTextAttribute(hConsole, WHITE);
 	}
 }
 
