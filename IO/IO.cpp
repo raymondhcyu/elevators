@@ -21,6 +21,7 @@ struct IODispatch {
 int E1Status[5] = {};
 int passengerEnable = 0;
 
+//Pipeline
 void dispatchPipeline(char* inputs);
 
 //function to get filtered user input from keyboard
@@ -42,6 +43,9 @@ void animationBuildFramework(void);
 
 UINT __stdcall UpdateDisplay(void* args) {
 
+	int previousPacket[5] = {0,0,0,0,0};
+	int flag = 0;
+
 	//create layout for animation
 	animationBuildFramework();
 
@@ -54,14 +58,37 @@ UINT __stdcall UpdateDisplay(void* args) {
 			E1Update /= 10;
 		}
 
-		//Update Elevator status bar in realtime
-		animationUpdateStatusBar(E1Status);
+		//check for change in packet
+		for (int i = 4; i >= 0; i--) {
+			if (previousPacket[i] != E1Status[i]) {
+				flag = 1;
+				break;
+			}
+		}
 
-		//Animate elevator in relatime
-		animationElevator(E1Status);
+		//execute animation if new packet
+		if (flag == 1) {
 
-		//reset cursor to data entry position
-		MOVE_CURSOR(24, 4); 
+			//Update Elevator status bar in realtime
+			animationUpdateStatusBar(E1Status);
+
+			//Animate elevator in relatime
+			animationElevator(E1Status);
+
+			//reset flag
+			flag = 0;
+
+			//reset cursor to data entry position
+			MOVE_CURSOR(24, 4); 
+
+		}
+
+		//Copy current packet into previous packet for comparison next loop
+		for (int i = 4; i >= 0; i--) {
+			previousPacket[i] = E1Status[i];
+		}
+
+
 		
 	}
 	return 0;
@@ -178,7 +205,7 @@ void getUserInput(char* input) {
 		console.Signal();
 	}
 
-	Sleep(500); //Delay time for user input to display
+	Sleep(750); //Delay time for user input to display
 }
 
 void animationElevator(int* status) {
@@ -259,13 +286,13 @@ void animationElevatorControl(int* status) {
 
 					SetConsoleTextAttribute(hConsole, YELLOW);
 					console.Wait();
-					cout << "[ | | ]" << i;
+					cout << "[ | | ]";
 					console.Signal();
 					Sleep(ELEVATOR_DOOR_DELAY);
 					i++;
 				}
 				else {
-					SetConsoleTextAttribute(hConsole, GREEN);
+					SetConsoleTextAttribute(hConsole, YELLOW);
 					console.Wait();
 					cout << "[  |  ]";
 					console.Signal();
@@ -283,6 +310,7 @@ void animationElevatorControl(int* status) {
 					i++;
 				}
 				else {
+					SetConsoleTextAttribute(hConsole, GREEN);
 					console.Wait();
 					cout << "[|   |]";
 					console.Signal();
@@ -380,7 +408,8 @@ void animationCurrentDirection(int* status) {
 	console.Wait();
 
 	int offset = 0;
-	char string = ' ';
+	int color = 0;
+	string string = "";
 
 	if (status[0] == 1) { //E1
 		offset = 3;
@@ -390,13 +419,20 @@ void animationCurrentDirection(int* status) {
 	}
 
 	if (status[1] == 1) { //If going down
-		string = 'DOWN';
+		string = "DOWN";
+		color = YELLOW;
 	}
 	if (status[1] == 2) { //If going up
-		string = ' UP ';
+		string = " UP ";
+		color = GREEN;
 	}
+	if (status[1] == 0) { //If stopped
+		string = "    ";
+	}
+
+	//Write text
 	MOVE_CURSOR(ANIMATION_TOPLEFT_X + offset, ANIMATION_TOPLEFT_Y - 2);
-	SetConsoleTextAttribute(hConsole, YELLOW);
+	SetConsoleTextAttribute(hConsole, color);
 	cout << string;
 	SetConsoleTextAttribute(hConsole, WHITE);
 
