@@ -271,7 +271,12 @@ void animationElevatorControl(int* status) {
 			MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
 		}
 
-		if (status[2] == 0) { //if out of service
+		if (status[2] == 0) { //out of service
+
+			i = 2;
+		}
+
+		if (status[2] == 9) { //E STOP
 			SetConsoleTextAttribute(hConsole, RED);
 			console.Wait();
 			cout << "[  X  ]";
@@ -279,6 +284,7 @@ void animationElevatorControl(int* status) {
 			SetConsoleTextAttribute(hConsole, WHITE);
 			i = 2;
 		}
+
 		if (status[2] == 1) { //if in service: display door open or closed
 
 			if (status[3] == 0) { //door closed
@@ -417,6 +423,9 @@ void animationCurrentDirection(int* status) {
 	if (status[0] == 2) { //E2
 		offset = 11;
 	}
+	if (status[2] == 0) {
+		offset = offset - 3; //IF out of service
+	}
 
 	if (status[1] == 1) { //If going down
 		string = "DOWN";
@@ -428,6 +437,9 @@ void animationCurrentDirection(int* status) {
 	}
 	if (status[1] == 0) { //If stopped
 		string = "    ";
+	}
+	if (status[2] == 0) {
+		string = "NO SERVICE";
 	}
 
 	//Write text
