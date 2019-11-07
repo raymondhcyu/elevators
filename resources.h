@@ -5,7 +5,7 @@ _ _ _ _ _
 
 0: Elevator number (1 or 2)
 1: Direction (0 not moving, 1 down, 2 up)
-2: Service status (0 out of service, 1 in service)
+2: Service status (0 out of service, 1 in service, 9 emergency stop)
 3: Door status (0 closed, 1 open)
 4: Floor status (0 - 9)
 

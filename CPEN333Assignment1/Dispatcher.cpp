@@ -21,6 +21,7 @@ int E1MessageResponse = 0; // update from E1
 int startFlag = 0; // start flag to initialize elevator
 int arrayStartFlag = 0; // flag to send message again to E1
 int arrayIncrementFlag = 0; // increment someArray counter by 1
+int emergencyStopFlag = 0; // returns all elevators to ground, open doors, and terminate program
 
 int someArray[100] = {}; // store all commands in here brute forced; can dynamically allocate for longer runtime
 
@@ -41,14 +42,19 @@ UINT __stdcall Thread1(void* args) {
 			std::cout << "Received " << pipeIOData.inputs << endl;
 			console.Signal(); }
 
+			// Safety first, check for emergency stop command
 			if (pipeIOData.inputs[0] == 'e') {
-				//console.Wait();
-				//cout << "Program should exit now..." << endl;
-				//console.Signal();
-			}
+				emergencyStopFlag = 1;
 
+				// Same message format as elevator down
+				messagePacket[0] = 1; // elevator select
+				messagePacket[1] = 1;
+				messagePacket[2] = 1;
+				messagePacket[3] = 0;
+				messagePacket[4] = 0; // convert character to int
+			}
 			// 'u' or 'd' command outside
-			if ((pipeIOData.inputs[0] == 'u') || (pipeIOData.inputs[0] == 'd')) {
+			else if ((pipeIOData.inputs[0] == 'u') || (pipeIOData.inputs[0] == 'd')) {
 				std::unordered_map<char, int> commandReference{ {'u', 2}, {'d', 1} }; // GCOM magic
 
 				messagePacket[0] = 1; // elevator select
@@ -58,12 +64,22 @@ UINT __stdcall Thread1(void* args) {
 				messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
 			}
 			// '1' or '2' leading command inside
-			else {
-				messagePacket[0] = atoi(&pipeIOData.inputs[0]); // elevator select
+			else if ((pipeIOData.inputs[0] == '1') || (pipeIOData.inputs[0] == '2')) {
+				std::unordered_map<char, int> floorReference{ {'1', 1}, {'2', 2} }; // GCOM magic x2
+
+				messagePacket[0] = floorReference[pipeIOData.inputs[0]]; // elevator select
 				messagePacket[1] = 0;
 				messagePacket[2] = 1;
 				messagePacket[3] = 0;
 				messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
+			}
+			// '-' leading command take out of service
+			else if (pipeIOData.inputs[0] == '-') {
+				// open doors? change service status
+			}
+			// '+' leading command bring back into service
+			else if (pipeIOData.inputs[0] == '+') {
+				// open doors? change service status
 			}
 			//{// Debugging
 			//	console.Wait();
@@ -129,7 +145,9 @@ UINT __stdcall Thread2(void* args) {
 			startFlag = 1;
 		}
 
-		if (someArray[i] != 0) {
+		if (emergencyStopFlag)
+			E1MessagePrevious = 11900; // [2] = 9 as emergency stop
+		else if (someArray[i] != 0) {
 			E1MessagePrevious = someArray[i];
 			arrayIncrementFlag = 0;
 		}
