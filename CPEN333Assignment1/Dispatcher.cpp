@@ -106,12 +106,14 @@ UINT __stdcall Thread1(void* args) {
 			}
 
 			someArray[i] = E1MessageFromPipe;
-			cout << __LINE__ << "\t";
+			
+			// Debugging
+			{cout << __LINE__ << "\t";
 			for (int j = 0; j < 99; j++) {
 				if (someArray[j] != 0)
 					cout << someArray[j];
 			}
-			cout << endl;
+			cout << endl; }
 			i++;
 
 			console.Wait();
@@ -119,8 +121,6 @@ UINT __stdcall Thread1(void* args) {
 			console.Signal();
 
 			E1MessageFromPipe = 0; // reset pipeline message after sent
-
-			//E1MailProducer.Signal();
 		}
 	}
 	return 0;
