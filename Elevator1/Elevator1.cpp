@@ -6,7 +6,7 @@ CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 UINT mailboxMessage;
 CMailbox dispatchMailbox;
 
-int E1Current[5] = {1, 0, 1, 1, 0}; // current status of E1 before commands
+int E1Current[5] = { 1, 0, 1, 1, 0 }; // current status of E1 before commands
 int E1Command[5] = {};
 
 int E1StartFlag = 0; // only once start condition
@@ -137,7 +137,5 @@ int main() {
 	}
 
 	cout << "Elevator 1 terminated..." << endl;
-
-	getchar();
 	return 0;
 }
