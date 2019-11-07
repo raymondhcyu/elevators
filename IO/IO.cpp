@@ -7,6 +7,7 @@
 
 TheMonitorOne E1Monitor;
 TheMonitorTwo E2Monitor;
+
 CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 
 CSemaphore inputB4output1("inputB4output1", 0);
@@ -25,7 +26,7 @@ int passengerEnable = 0;
 void dispatchPipeline(char* inputs);
 
 //function to get filtered user input from keyboard
-void getUserInput(char* input); 
+int getUserInput(char* input); 
 
 //Animation functions
 void animationElevator(int* status);
@@ -38,8 +39,6 @@ void animationCurrentDirection(int* status);
 void animationClearPrevious(int* status);
 void animationUpdateStatusBar(int* status);
 void animationBuildFramework(void);
-
-
 
 UINT __stdcall UpdateDisplay(void* args) {
 
@@ -75,6 +74,11 @@ UINT __stdcall UpdateDisplay(void* args) {
 			//Animate elevator in relatime
 			animationElevator(E1Status);
 
+			//Terminate thread if E stop pressed
+			if (E1Status[2] == 9) {
+				break;
+			}
+
 			//reset flag
 			flag = 0;
 
@@ -87,18 +91,20 @@ UINT __stdcall UpdateDisplay(void* args) {
 		for (int i = 4; i >= 0; i--) {
 			previousPacket[i] = E1Status[i];
 		}
-
-
 		
 	}
+
 	return 0;
 }
 
 UINT __stdcall UserInput(void* args) {
 	while (1) {
 		inputB4output2.Wait();
-		getUserInput((char*) args);
+		if (getUserInput((char*)args) == 9) {
+			break;
+		}
 		inputB4output1.Signal();
+
 	}
 	return 0;
 }
@@ -138,7 +144,7 @@ void dispatchPipeline(char* userInput) {
 	PipeIODispatch.Write(&dispatch);
 }
 
-void getUserInput(char* input) {
+int getUserInput(char* input) {
 
 	console.Wait();
 	MOVE_CURSOR(0, 4);
@@ -203,9 +209,19 @@ void getUserInput(char* input) {
 		console.Wait();
 		cout << input[1];
 		console.Signal();
+
 	}
 
 	Sleep(750); //Delay time for user input to display
+
+
+	//terminate thread if E STOP
+	if (input[1] == 'e') {
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 void animationElevator(int* status) {
@@ -262,20 +278,21 @@ void animationClearPrevious(int* status) {
 void animationElevatorControl(int* status) {
 
 	int i = 0; 
+	int flag = 0;
 
 	while (i < 2) {
+
+		if (status[2] == 0) { //out of service
+			i = 2;
+		}
+
 		if (status[0] == 1) {
 			MOVE_CURSOR(E1_TOPLEFT_X, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
 		}
 		if (status[0] == 2) {
 			MOVE_CURSOR(E2_TOPLEFT_X, ANIMATION_TOPLEFT_Y + NUM_FLOORS - 1 - status[4]);
 		}
-
-		if (status[2] == 0) { //out of service
-
-			i = 2;
-		}
-
+		
 		if (status[2] == 9) { //E STOP
 			SetConsoleTextAttribute(hConsole, RED);
 			console.Wait();
@@ -418,28 +435,30 @@ void animationCurrentDirection(int* status) {
 	string string = "";
 
 	if (status[0] == 1) { //E1
-		offset = 3;
+		offset = 0;
 	}
 	if (status[0] == 2) { //E2
-		offset = 11;
-	}
-	if (status[2] == 0) {
-		offset = offset - 3; //IF out of service
+		offset = 8;
 	}
 
 	if (status[1] == 1) { //If going down
-		string = "DOWN";
+		string = "   DOWN   ";
 		color = YELLOW;
 	}
 	if (status[1] == 2) { //If going up
-		string = " UP ";
+		string = "    UP    ";
 		color = GREEN;
 	}
 	if (status[1] == 0) { //If stopped
-		string = "    ";
+		string = "          ";
 	}
 	if (status[2] == 0) {
 		string = "NO SERVICE";
+		color = RED;
+	}
+	if (status[2] == 9) {
+		string = "~E-STOP~ ";
+		color = RED;
 	}
 
 	//Write text
