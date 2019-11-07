@@ -94,22 +94,21 @@ int main() {
 			else if ((E1Command[4] == E1Current[4]) && (E1StartFlag != 0)) {
 				cout << __LINE__ << endl;
 
-				// Check if moving up or down to stop moving
+				// Check if moving up or down to stop moving & open doors (at request of Jason)
 				if ((E1Current[1] == 2) || (E1Current[1] == 1)) {
 					cout << __LINE__ << endl;
-
 					Sleep(500); // delay to stop moving
 					E1Current[1] = 0;
-					E1Monitor.setInfo(E1Current);
-				}
-				// Open doors
-				else if (E1Current[3] == 0) {
-					cout << __LINE__ << endl;
-
-					Sleep(500);
 					E1Current[3] = 1;
 					E1Monitor.setInfo(E1Current);
 				}
+				//// Open doors
+				//else if (E1Current[3] == 0) {
+				//	cout << __LINE__ << endl;
+				//	Sleep(500);
+				//	E1Current[3] = 1;
+				//	E1Monitor.setInfo(E1Current);
+				//}
 				else // condition where it stopped on destination floor and doors open
 					E1Monitor.setInfo(E1Current);
 			}
