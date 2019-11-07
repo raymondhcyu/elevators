@@ -182,19 +182,19 @@ UINT __stdcall Thread2(void* args) {
 
 int main(void) {
 	// Elevator 1 child process
-	CProcess p1("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\Elevator1.exe",
+	CProcess p1("..\\Debug\\Elevator1.exe",
 		NORMAL_PRIORITY_CLASS,
 		OWN_WINDOW,
 		ACTIVE
 	);
 	// Elevator 2 child process
-	CProcess p2("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\Elevator2.exe",
+	CProcess p2("..\\Debug\\Elevator2.exe",
 		NORMAL_PRIORITY_CLASS,
 		OWN_WINDOW,
 		ACTIVE
 	);
 	// IO child process
-	CProcess p3("D:\\Documents\\CPEN333\\Assignments\\CPEN333Assignment1\\Debug\\IO.exe",
+	CProcess p3("..\\Debug\\IO.exe",
 		NORMAL_PRIORITY_CLASS,
 		OWN_WINDOW,
 		ACTIVE
