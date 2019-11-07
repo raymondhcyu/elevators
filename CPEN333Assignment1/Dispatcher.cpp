@@ -20,7 +20,7 @@ int E1MessageResponse = 0; // update from E1
 
 int startFlag = 0; // start flag to initialize elevator
 int arrayStartFlag = 0; // flag to send message again to E1
-int arrayIncrementFlag = 0;
+int arrayIncrementFlag = 0; // increment someArray counter by 1
 
 int someArray[100] = {}; // store all commands in here brute forced; can dynamically allocate for longer runtime
 
@@ -47,17 +47,24 @@ UINT __stdcall Thread1(void* args) {
 				//console.Signal();
 			}
 
-			std::unordered_map<char, int> commandReference{ {'u', 2}, {'d', 1} }; // GCOM magic
+			// 'u' or 'd' command outside
+			if ((pipeIOData.inputs[0] == 'u') || (pipeIOData.inputs[0] == 'd')) {
+				std::unordered_map<char, int> commandReference{ {'u', 2}, {'d', 1} }; // GCOM magic
 
-			// Up or down commands only 
-			//E1MailConsumer.Wait(); // produce message for mailbox
-
-			messagePacket[0] = 1;
-			messagePacket[1] = commandReference[pipeIOData.inputs[0]];
-			messagePacket[2] = 1;
-			messagePacket[3] = 0;
-			messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
-
+				messagePacket[0] = 1; // elevator select
+				messagePacket[1] = commandReference[pipeIOData.inputs[0]];
+				messagePacket[2] = 1;
+				messagePacket[3] = 0;
+				messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
+			}
+			// '1' or '2' leading command inside
+			else {
+				messagePacket[0] = atoi(&pipeIOData.inputs[0]); // elevator select
+				messagePacket[1] = 0;
+				messagePacket[2] = 1;
+				messagePacket[3] = 0;
+				messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
+			}
 			//{// Debugging
 			//	console.Wait();
 			//	cout << "Message packet content is ";
@@ -67,14 +74,10 @@ UINT __stdcall Thread1(void* args) {
 			//	console.Signal();
 			//}
 
-			//E1MessagePrevious = 0; // reset previous message since command complete
-
 			// Convert message packet int array to int
 			for (int j = 0; j < 5; j++) {
 				E1MessageFromPipe *= 10;
-				//E1MessagePrevious *= 10;
 				E1MessageFromPipe += messagePacket[j];
-				//E1MessagePrevious += messagePacket[j];
 			}
 
 			someArray[i] = E1MessageFromPipe;
