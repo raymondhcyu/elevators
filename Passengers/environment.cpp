@@ -1,6 +1,10 @@
 #include "..\rt.h"
 #include "..\resources.h"
 #include "passenger.h"
+#include <iostream>  
+#include <numeric>   
+
+int arraySum(int a[], int n);
 
 
 int main(void) {
@@ -16,33 +20,32 @@ int main(void) {
 	//READY PEEPS
 
 	passenger* myPs[MAX_PASSENGERS]; // create people as active class objects
+	int myPsTracker[MAX_PASSENGERS] = {};
 	
-	int count = 0;
+	int index = 0;
 
 	while (1) {
 		
-		if (rand() / 100 / 7 == 0) {
 
+		//random passenger creation
+		if (rand() / 100 / 7 == 0) {
+			myPs[index] = new passenger(index); //assigns unique id num
+			myPsTracker[index] = 1;
+			index++;
 		}
 		
 
+
+
 	}
 
-	
-
-	for (int i = 0; i < MAX_PASSENGERS; i++) {
-		myPs[i] = new passenger(i + 1); //assigns unique id num
-	}
-
-	//START PEEPS
-	for (int i = 0; i < MAX_PASSENGERS; i++) { //start people - ie. they exist, but may not be in the building
-		myPs[i]->Resume();
-	}
-
-	//WAIT FOR PEEPS
-	for (int i = 0; i < MAX_PASSENGERS; i++) {
-		myPs[i]->WaitForThread();
-	}
 
 	return 0;
+}
+
+
+int arraySum(int a[], int n)
+{
+	int initial_sum = 0;
+	return accumulate(a, a + n, initial_sum);
 }
