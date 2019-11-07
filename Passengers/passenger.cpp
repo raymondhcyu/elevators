@@ -20,7 +20,16 @@ int passenger::main(void) {
 	//SEMAPHORES
 	CSemaphore monitor("Monitor", 1, 1);
 
+	while (1) {
 
+
+
+
+
+
+
+
+	}
 
 	
 

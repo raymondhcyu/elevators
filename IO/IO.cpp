@@ -44,7 +44,7 @@ void animationBuildFramework(void);
 UINT __stdcall UpdateDisplay(void* args) {
 
 	int previousE1Packet[5] = {0,0,0,0,0};
-	int previousE2Packet[5] = {0,0,0,0,0};
+	int previousE2Packet[5] = { 0,0,0,0,0 };
 	int flagE1 = 0;
 	int flagE2 = 0;
 
@@ -55,12 +55,10 @@ UINT __stdcall UpdateDisplay(void* args) {
 
 		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO(); // wait for data?
+		int E2Update= E2Monitor.getInfoIO(); // wait for data? //ERROR HERE - stuck waiting for E2 Data...
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;
-		}
-		int E2Update = E2Monitor.getInfoIO(); // wait for data?
-		for (int i = 4; i >= 0; i--) {
 			E2Status[i] = E2Update % 10;
 			E2Update /= 10;
 		}
@@ -70,8 +68,6 @@ UINT __stdcall UpdateDisplay(void* args) {
 			if (previousE1Packet[i] != E1Status[i]) {
 				flagE1 = 1;
 			}
-		}
-		for (int i = 4; i >= 0; i--) {
 			if (previousE2Packet[i] != E2Status[i]) {
 				flagE2 = 1;
 			}
@@ -123,8 +119,6 @@ UINT __stdcall UpdateDisplay(void* args) {
 		//Copy current packet into previous packet for comparison next loop
 		for (int i = 4; i >= 0; i--) {
 			previousE1Packet[i] = E1Status[i];
-		}
-		for (int i = 4; i >= 0; i--) {
 			previousE2Packet[i] = E2Status[i];
 		}
 		
