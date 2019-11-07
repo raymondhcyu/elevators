@@ -53,14 +53,14 @@ UINT __stdcall Thread1(void* args) {
 				messagePacket[3] = 0;
 				messagePacket[4] = 0; // convert character to int
 
-				//for (int j = 0; j < 5; j++) {
-				//	E1MessageFromPipe *= 10;
-				//	E1MessageFromPipe += messagePacket[j];
-				//}
+				for (int j = 0; j < 5; j++) {
+					E1MessageFromPipe *= 10;
+					E1MessageFromPipe += messagePacket[j];
+				}
 
-				//someArray[i] = E1MessageFromPipe;
+				someArray[i] = E1MessageFromPipe;
 
-				//break; // stop while loop
+				break; // stop while loop
 			}
 			// 'u' or 'd' command outside
 			else if ((pipeIOData.inputs[0] == 'u') || (pipeIOData.inputs[0] == 'd')) {
@@ -174,19 +174,19 @@ UINT __stdcall Thread2(void* args) {
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
-		//if (E1MessageResponse == 11900) {
-		//	cout << __LINE__ << endl;
+		if (E1MessageResponse == 10910) {
+			cout << __LINE__ << endl;
 
-		//	E1MailConsumer.Wait(); // produce message for mailbox
-		//	E1Message = 11900;
-		//	E1MailProducer.Signal();
-		//	cout << __LINE__ << endl;
+			E1MailConsumer.Wait(); // produce message for mailbox
+			E1Message = 10910;
+			E1MailProducer.Signal();
+			cout << __LINE__ << endl;
 
-		//	break; // exit while loop
-		//}
+			break; // exit while loop
+		}
 		// Check if elevator done; -2000 checks up motion, +10 checks door
 		// E.g. command - 1990 = elevator arrived on target floor stopped, and doors open
-		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
+		else if (((E1MessagePrevious - 1990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
@@ -270,25 +270,40 @@ int main(void) {
 
 	while (1) {
 		// Send mail to E1 through p1
+		if (E1MessageResponse == 10910) {// check termination first
+			cout << "Dispatcher complete 0 ..." << endl;
+			break;
+		}
+
 		E1MailProducer.Wait();
-		//if (E1Message == 11900) // termination command
-		//	break;
+		cout << __LINE__ << endl;
+
 		if (E1Message != 0) {
 			p1.Post(E1Message);
 		}
 		E1Message = 0; // reset message after sent
+		cout << __LINE__ << endl;
+
 		E1MailConsumer.Signal();
 	}
 
-	cout << "Dispatcher complete..." << endl;
+	cout << "Dispatcher complete 1 ..." << endl;
 
 	t1.WaitForThread();
+	cout << __LINE__ << endl;
+
 	t2.WaitForThread();
 
+	cout << __LINE__ << endl;
+
 	p1.WaitForProcess();
+	cout << __LINE__ << endl;
+
 	p2.WaitForProcess();
+	cout << __LINE__ << endl;
+
 	p3.WaitForProcess();
 
-	cout << "Dispatcher complete..." << endl;
+	cout << "Dispatcher complete 2 ..." << endl;
 	return 0;
 }
