@@ -142,18 +142,21 @@ UINT __stdcall Thread2(void* args) {
 			cout << __LINE__ << endl;
 
 			E1MailConsumer.Wait(); // produce message for mailbox
-			// 10110
-			messagePacket[0] = 1;
-			messagePacket[1] = 0;
-			messagePacket[2] = 1;
-			messagePacket[3] = 1;
-			messagePacket[4] = 0;
+			//// 10110
+			//messagePacket[0] = 1;
+			//messagePacket[1] = 0;
+			//messagePacket[2] = 1;
+			//messagePacket[3] = 1;
+			//messagePacket[4] = 0;
 
-			// Convert message packet int array to int
-			for (int j = 0; j < 5; j++) {
-				E1Message *= 10;
-				E1Message += messagePacket[j];
-			}
+			//// Convert message packet int array to int
+			//for (int j = 0; j < 5; j++) {
+			//	E1Message *= 10;
+			//	E1Message += messagePacket[j];
+			//}
+
+			E1Message = 10110;
+			E2Message = 20110;
 
 			// Signal to mailbox that ready to send
 			E1MailProducer.Signal();
@@ -161,15 +164,53 @@ UINT __stdcall Thread2(void* args) {
 		}
 
 		E1MessageResponse = E1Monitor.getInfoDispatch();
+		E2MessageResponse = E2Monitor.getInfoDispatch();
 
-		if (emergencyStopFlag)
+		if (emergencyStopFlag) {
 			E1MessagePrevious = 11900; // [2] = 9 as termination
+			E2MessagePrevious = 21900;
+		}
 		else if (someArray[i] != 0) {
-			E1MessagePrevious = someArray[i];
+
+			E1MessagePrevious = someArray[i]; // before someArray gets modified
+
+			int theMessagePrevious[5] = {};
+			// Convert int to int array
+			for (int j = 4; j >= 0; j--) {
+				theMessagePrevious[j] = someArray[i] % 10;
+				someArray[i] /= 10;
+			}
+
+			console.Wait();
+			cout << "theMessagePrevious is ";
+			for (auto& mpData : theMessagePrevious) // GCOM magic
+				cout << mpData;
+			cout << endl;
+			console.Signal();
+
+			int E2SameCommand = 0;
+			if (theMessagePrevious[0] == 1) {
+				theMessagePrevious[0] = 2;
+				// Convert int array to int
+				for (int j = 0; j < 5; j++) {
+					E2SameCommand *= 10;
+					E2SameCommand += theMessagePrevious[j];
+				}
+
+				cout << "The same command to send to E2 is: " << E2SameCommand << endl;
+			}
+
+			//if (theMessagePrevious[0] == 0) { // means a 'u' or 'd' command received
+			//	
+			//}
+
+			E2MessagePrevious = E2SameCommand; // brute force make two elevators move
+
 			arrayIncrementFlag = 0;
 		}
 		else if (arrayStartFlag == 0) { // only happen once 
 			E1MessagePrevious = 10110;
+			E2MessagePrevious = 20110;
 			arrayStartFlag = 1;
 		}
 		// Else previous message = previous message
@@ -178,14 +219,17 @@ UINT __stdcall Thread2(void* args) {
 		cout << endl;
 		cout << "E1 Message response: " << E1MessageResponse << endl;
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
+		cout << "E2 Message response: " << E2MessageResponse << endl;
+		cout << "E2 Message previous: " << E2MessagePrevious << endl;
 		console.Signal(); }
 
 		// Check if termination message is sent by elevator 1
-		if (E1MessageResponse == 10910) {
+		if ((E1MessageResponse == 10910) && (E2MessageResponse == 20910)) {
 			cout << __LINE__ << endl;
 
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = 10910;
+			E2Message = 20910;
 			E1MailProducer.Signal();
 			cout << __LINE__ << endl;
 
@@ -193,42 +237,46 @@ UINT __stdcall Thread2(void* args) {
 		}
 		// Check if elevator done; -2000 checks up motion, +10 checks door
 		// E.g. command - 1990 = elevator arrived on target floor stopped, and doors open
-		else if (((E1MessagePrevious - 1990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
+		else if (((E1MessagePrevious - 1990) == E1MessageResponse) && ((E2MessagePrevious - 1990) == E2MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
 			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious - 1990;
+			E2Message = E2MessagePrevious - 1990;
 			E1MailProducer.Signal();
 			arrayIncrementFlag = 1;
 		}
 		// Check if elevator done; -1000 checks down motion, +10 checks door
 		// E.g. command - 990 = elevator arrived on target floor stopped, and doors open
-		else if (((E1MessagePrevious - 990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
+		else if (((E1MessagePrevious - 990) == E1MessageResponse) && ((E2MessagePrevious - 990) == E2MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
 			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious - 990;
+			E2Message = E2MessagePrevious - 990;
 			E1MailProducer.Signal();
 			arrayIncrementFlag = 1;
 		}
 		// Check if elevator done from inside; +10 checks door (for up or down)
 		// E.g. command + 10 = elevator arrived on target floor stopped, and doors open
-		else if (((E1MessagePrevious + 10) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
+		else if (((E1MessagePrevious + 10) == E1MessageResponse) && ((E2MessagePrevious + 10) == E2MessageResponse) && (arrayIncrementFlag == 0)) {
 			i++;
 			//console.Wait();
 			//cout << "Value of i is " << i << endl;
 			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious + 10;
+			E2Message = E2MessagePrevious + 10;
 			E1MailProducer.Signal();
 			arrayIncrementFlag = 1;
 		}
 		else {
 			E1MailConsumer.Wait(); // produce message for mailbox
+			E2Message = E2MessagePrevious;
 			E1Message = E1MessagePrevious;
 			E1MailProducer.Signal();
 		}
@@ -262,16 +310,16 @@ int main(void) {
 		ACTIVE
 	);
 
-	CThread t1(Thread1, ACTIVE, NULL);
-	CThread t2(Thread2, ACTIVE, NULL);
-
 	// Rendezvous to start processes together
 	r1.Wait();
 	cout << "Dispatcher initializing..." << endl;
 
+	CThread t1(Thread1, ACTIVE, NULL);
+	CThread t2(Thread2, ACTIVE, NULL);
+
 	while (1) {
 		// Send mail to E1 through p1
-		if (E1MessageResponse == 10910) {// check termination first
+		if ((E1MessageResponse == 10910) && (E2MessageResponse == 20910)) {// check termination first
 			cout << "Dispatcher complete 0 ..." << endl;
 			break;
 		}
@@ -281,6 +329,7 @@ int main(void) {
 
 		if (E1Message != 0) {
 			p1.Post(E1Message);
+			p2.Post(E2Message);
 		}
 		E1Message = 0; // reset message after sent
 		cout << __LINE__ << endl;
