@@ -4,8 +4,7 @@
 
 
 
-
-car::car(int num, int pit1, int pit2) {
+passenger::passenger(int id) {
 	carNum = num;
 	pitLap1 = pit1;
 	pitLap2 = pit2;
@@ -14,7 +13,7 @@ car::car(int num, int pit1, int pit2) {
 
 
 
-int car::main(void) {
+int passenger::main(void) {
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //to change console colors etc 
 

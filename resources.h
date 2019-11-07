@@ -17,6 +17,7 @@ Debugging tip: "Sprinkle print lines"
 #define __resources__
 
 #define NUM_FLOORS 10
+#define MAX_PASSENGERS 20
 
 #define ANIMATION_TOPLEFT_X 10
 #define ANIMATION_TOPLEFT_Y 10

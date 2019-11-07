@@ -12,8 +12,9 @@ private:
 
 	//VARS
 	int pNum; //passenger ID number
-	int pStatus = 0; // 0 - 
-	int pFloor = 0; //Lap counter
+	int pStatus = 0; // 0 - Deactivated, 1 Activated
+	int pElevator = 0; // 1 - Elevator 1, 2 - Elevator 2
+	int pFloor = 0; // Start on floor 0 always
 
 
 	//MAIN
@@ -27,7 +28,7 @@ public:
 
 
 	//STRUCTORS
-	car(int num, int pit1, int pit2);
+	passenger(int id);
 
 };
 

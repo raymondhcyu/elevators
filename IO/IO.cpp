@@ -432,7 +432,13 @@ void animationUpdateStatusBar(int* status) {
 		case 1:
 			cout << "In service		";
 			break;
+		case 9: 
+			SetConsoleTextAttribute(hConsole, RED);
+			cout << "E-STOP			";
+			SetConsoleTextAttribute(hConsole, WHITE);
+			break;
 		}
+		
 
 		switch (E1Status[3]) {
 		case 0:
