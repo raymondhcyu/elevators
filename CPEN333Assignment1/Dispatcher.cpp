@@ -14,19 +14,25 @@ IODispatch pipeIOData;
 int messagePacket[5] = {}; // message packet interpretted from IO
 int E1Message = 0; // message packet to be sent to E1 mailbox
 int E1MessageFromPipe = 0;
+int E2Message = 0; // message packet to be sent to E2 mailbox
+int E2MessageFromPipe = 0;
 
 int E1MessagePrevious = 0; // previous message packet sent to E1 mailbox for comparison
 int E1MessageResponse = 0; // update from E1
+int E2MessagePrevious = 0; // previous message packet sent to E2 mailbox for comparison
+int E2MessageResponse = 0; // update from E2
 
 int startFlag = 0; // start flag to initialize elevator
-int arrayStartFlag = 0; // flag to send message again to E1
+int arrayStartFlag = 0; // flag to send message again to E1 ***and 2?***
 int arrayIncrementFlag = 0; // increment someArray counter by 1
 int emergencyStopFlag = 0; // returns all elevators to ground, open doors, and terminate program
 
-int someArray[100] = {}; // store all commands in here brute forced; can dynamically allocate for longer runtime
+int someArray[100] = {}; // store all commands in here; can dynamically allocate for longer runtime
 
 CSemaphore E1MailProducer("E1MailProducer", 0);
 CSemaphore E1MailConsumer("E1MailConsumer", 1);
+CSemaphore E2MailProducer("E2MailProducer", 0);
+CSemaphore E2MailConsumer("E2MailConsumer", 1);
 
 UINT __stdcall Thread1(void* args) {
 	int i = 0;
