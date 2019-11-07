@@ -35,8 +35,6 @@ Debugging tip: "Sprinkle print lines"
 #define WHITE 7 
 #define GRAY 8
 
-
-
 #include "rt.h"
 
 const CMutex console("Console");
@@ -70,21 +68,24 @@ class TheMonitorTwo {
 private:
 	struct theData {
 		int floor; // which floor it is on; European convention
+		int doorStatus;
+		int direction;
+		int serviceStatus;
 	};
 
 	CDataPool* theDataPool;  // a datapool containing the data to be protected 
 	theData* dataPtr;			// pointer to the data
 
-	CSemaphore* ps1;
-	CSemaphore* ps2;
-	CSemaphore* cs1;
-	CSemaphore* cs2;
+	CSemaphore* ps3;
+	CSemaphore* ps4;
+	CSemaphore* cs3;
+	CSemaphore* cs4;
 
 public:
 	TheMonitorTwo(); // default constructor; default floor 0
-	void setFloor(int initFloor); // update floor
-	int getFloorIO(void); // floor currently on
-	int getFloorDispatch(void); // floor currently on
+	void setInfo(int* data); // set data in message packet format
+	int getInfoIO(void); // get data in message packet format
+	int getInfoDispatch(void); // get data in message packet format
 	~TheMonitorTwo();
 };
 
