@@ -2,12 +2,14 @@
 #include "..\resources.h"
 #include "passenger.h"
 
+struct IOPassenger {
+	char inputs[3];
+};
 
+IOPassenger pipePassengerData;
 
 passenger::passenger(int id) {
-	carNum = num;
-	pitLap1 = pit1;
-	pitLap2 = pit2;
+	pNum = id;
 
 };
 
@@ -20,10 +22,27 @@ int passenger::main(void) {
 	//SEMAPHORES
 	CSemaphore monitor("Monitor", 1, 1);
 
+	int flagStatus = 0;
+
 	while (1) {
 
 
+		if (pStatus == 1 && flagStatus != 1) {
 
+			//send data to elevator via pieline
+
+			CTypedPipe <IOPassenger> PipeIOPassenger("PipelineIOPassenger", 100);
+
+			char data[3] = {};
+			data[0] = 1;
+			data[1] = pFloorDes;
+
+			strcpy_s(pipePassengerData.inputs, data); // copy input to struct, change to receive user input later
+
+			PipeIOPassenger.Write(&pipePassengerData); //writes data to pipe
+
+			flagStatus = 1; //disables this if staement
+		}
 
 
 
@@ -37,6 +56,8 @@ int passenger::main(void) {
 
 }
 
+
+
 int passenger::getpStatus(void) {
 
 	return pStatus;
@@ -48,26 +69,45 @@ int passenger::getpElevator(void) {
 
 }
 
-int passenger::getpFloor(void) {
+int passenger::getpFloorCurrent(void) {
 
-	return pFloor;
+	return pFloorCurr;
 
 }
 
-int passenger::setpStatus(int status) {
+int passenger::getpFloorDesired(void) {
+
+	return pFloorDes;
+
+}
+
+int passenger::getpNum(void) {
+
+	return pNum;
+}
+
+
+
+void passenger::setpStatus(int status) {
 
 	pStatus = status;
 	
 }
 
-int passenger::setpElevator(int elevator) {
+void passenger::setpElevator(int elevator) {
 
 	pElevator = elevator;
 
 }
 
-int passenger::setpFloor(int floor) {
+void passenger::setpFloorCurrent(int floor) {
 
-	pFloor = floor;
+	pFloorCurr = floor;
+
+}
+
+void passenger::setpFloorDesired(int floor) {
+
+	pFloorDes = floor;
 
 }

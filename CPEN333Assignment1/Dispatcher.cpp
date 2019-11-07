@@ -255,6 +255,12 @@ int main(void) {
 		OWN_WINDOW,
 		ACTIVE
 	);
+	// Passengers child process
+	CProcess p4("..\\Debug\\Passengers.exe",
+		NORMAL_PRIORITY_CLASS,
+		OWN_WINDOW,
+		ACTIVE
+	);
 
 	CThread t1(Thread1, ACTIVE, NULL);
 	CThread t2(Thread2, ACTIVE, NULL);
@@ -298,6 +304,8 @@ int main(void) {
 	cout << __LINE__ << endl;
 
 	p3.WaitForProcess();
+
+	p4.WaitForProcess();
 
 	cout << "Dispatcher complete 2 ..." << endl;
 	return 0;

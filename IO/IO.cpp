@@ -22,6 +22,14 @@ struct IODispatch {
 	char inputs[3];
 };
 
+struct IOPassenger {
+	char inputs[3];
+};
+
+IOPassenger pipePassengerData;
+
+CTypedPipe <IOPassenger> PipeIOPassenger("PipelineIOPassenger", 100); // room for 100 data
+
 int E1Status[5] = {};
 int E2Status[5] = {};
 int passengerEnable = 0;
@@ -163,6 +171,8 @@ int main() {
 	cout << "Elevator\tDirection\tService Status\t\tDoor status\t\tFloor" << endl;
 	
 	char input[3] = {};
+	char inputPassenger[3] = {};
+
 	int flag = 0; //E Stop flag to end thread
 
 	CThread t1(UpdateDisplay, ACTIVE, NULL);
@@ -170,9 +180,19 @@ int main() {
 
 	while (1) {
 
-		inputB4output1.Wait();
-		flag = dispatchPipeline(input);
-		inputB4output2.Signal();
+		//check for passenger input and send that if so, otherwise send normal user input data
+		if (PipeIOPassenger.TestForData() >= sizeof(pipePassengerData) / 3) { // size of struct is 3
+			PipeIOPassenger.Read(&pipePassengerData);
+			strcpy(inputPassenger, pipePassengerData.inputs);
+			inputB4output1.Wait();
+			flag = dispatchPipeline(inputPassenger);
+			inputB4output2.Signal();
+		}
+		else {
+			inputB4output1.Wait();
+			flag = dispatchPipeline(input);
+			inputB4output2.Signal();
+		}
 
 		//E Stop to terminate main() and close IO
 		if (flag == 9) {
@@ -344,7 +364,7 @@ void animationElevatorControl(int* status) {
 	int flag = 0;
 
 	while (i < 2) {
-
+		
 		if (status[2] == 0) { //out of service
 			i = 2;
 		}
