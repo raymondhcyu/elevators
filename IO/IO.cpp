@@ -23,7 +23,7 @@ int E1Status[5] = {};
 int passengerEnable = 0;
 
 //Pipeline
-void dispatchPipeline(char* inputs);
+int dispatchPipeline(char* inputs);
 
 //function to get filtered user input from keyboard
 int getUserInput(char* input); 
@@ -61,7 +61,7 @@ UINT __stdcall UpdateDisplay(void* args) {
 		for (int i = 4; i >= 0; i--) {
 			if (previousPacket[i] != E1Status[i]) {
 				flag = 1;
-				break;
+				//break;
 			}
 		}
 
@@ -98,14 +98,20 @@ UINT __stdcall UpdateDisplay(void* args) {
 }
 
 UINT __stdcall UserInput(void* args) {
+
+	int flag = 0; //E Stop flag to end thread
+
 	while (1) {
 		inputB4output2.Wait();
-		if (getUserInput((char*)args) == 9) {
-			break;
-		}
+		flag = getUserInput((char*)args);
 		inputB4output1.Signal();
 
+		if(flag == 9) {
+			break;
+		}
+
 	}
+
 	return 0;
 }
 
@@ -116,6 +122,7 @@ int main() {
 	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
 	
 	char input[3] = {};
+	int flag = 0; //E Stop flag to end thread
 
 	CThread t1(UpdateDisplay, ACTIVE, NULL);
 	CThread t2(UserInput, ACTIVE, input);
@@ -123,25 +130,40 @@ int main() {
 	while (1) {
 
 		inputB4output1.Wait();
-		dispatchPipeline(input);
+		flag = dispatchPipeline(input);
 		inputB4output2.Signal();
+
+		//E Stop to terminate main() and close IO
+		if (flag == 9) {
+			break;
+		}
 		
 	}
 
 	t1.WaitForThread();
 	t2.WaitForThread();
 
+	getchar();
+
 	return 0;
 }
 
 
-void dispatchPipeline(char* userInput) {
+int dispatchPipeline(char* userInput) {
 	CTypedPipe <IODispatch> PipeIODispatch("PipelineIODispatch", 100);
 
 	IODispatch dispatch;
 	strcpy(dispatch.inputs, userInput); // copy input to struct, change to receive user input later
 
 	PipeIODispatch.Write(&dispatch);
+
+	if (userInput[1] == 'e')
+	{
+		return 9;
+	}
+	else {
+		return 0;
+	}
 }
 
 int getUserInput(char* input) {
@@ -217,7 +239,7 @@ int getUserInput(char* input) {
 
 	//terminate thread if E STOP
 	if (input[1] == 'e') {
-		return 1;
+		return 9;
 	}
 	else {
 		return 0;
