@@ -4,6 +4,9 @@
 #include "..\resources.h"
 #include <conio.h>
 #include <stdio.h>
+#include <iostream>
+#include <Windows.h>
+#include <fstream>
 
 TheMonitorOne E1Monitor;
 TheMonitorTwo E2Monitor;
@@ -44,7 +47,7 @@ void animationBuildFramework(void);
 UINT __stdcall UpdateDisplay(void* args) {
 
 	int previousE1Packet[5] = {0,0,0,0,0};
-	int previousE2Packet[5] = { 0,0,0,0,0 };
+	int previousE2Packet[5] = {0,0,0,0,0};
 	int flagE1 = 0;
 	int flagE2 = 0;
 
@@ -55,7 +58,7 @@ UINT __stdcall UpdateDisplay(void* args) {
 
 		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO(); // wait for data?
-		int E2Update= E2Monitor.getInfoIO(); // wait for data? //ERROR HERE - stuck waiting for E2 Data...
+		int E2Update = 0; // E2Monitor.getInfoIO(); // wait for data? //ERROR HERE - stuck waiting for E2 Data...
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;
@@ -76,11 +79,15 @@ UINT __stdcall UpdateDisplay(void* args) {
 		//execute animation if new packet
 		if (flagE1 == 1) {
 
+			console.Wait();
+
 			//Update Elevator status bar in realtime
 			animationUpdateStatusBar(E1Status);
 
 			//Animate elevator in relatime
 			animationElevator(E1Status);
+
+			console.Signal();
 
 			//Terminate thread if E stop pressed
 			if (E1Status[2] == 9) {
@@ -91,17 +98,21 @@ UINT __stdcall UpdateDisplay(void* args) {
 			flagE1 = 0;
 
 			//reset cursor to data entry position
-			MOVE_CURSOR(24, 4); 
+			MOVE_CURSOR(24, INPUT_TOPLEFT_Y); 
 
 		}
 
 		if (flagE2 == 1) {
+
+			console.Wait();
 
 			//Update Elevator status bar in realtime
 			animationUpdateStatusBar(E2Status);
 
 			//Animate elevator in relatime
 			animationElevator(E2Status);
+
+			console.Signal();
 
 			//Terminate thread if E stop pressed
 			if (E2Status[2] == 9) {
@@ -112,7 +123,7 @@ UINT __stdcall UpdateDisplay(void* args) {
 			flagE2 = 0;
 
 			//reset cursor to data entry position
-			MOVE_CURSOR(24, 4);
+			MOVE_CURSOR(24, INPUT_TOPLEFT_Y);
 
 		}
 
@@ -149,7 +160,7 @@ UINT __stdcall UserInput(void* args) {
 int main() {
 	// Rendezvous to start
 	r1.Wait();
-	cout << "Elevator 1\nDirection\t\tService Status\t\tDoor status\t\tFloor\n" << endl;
+	cout << "Elevator\tDirection\tService Status\t\tDoor status\t\tFloor" << endl;
 	
 	char input[3] = {};
 	int flag = 0; //E Stop flag to end thread
@@ -199,11 +210,11 @@ int dispatchPipeline(char* userInput) {
 int getUserInput(char* input) {
 
 	console.Wait();
-	MOVE_CURSOR(0, 4);
+	MOVE_CURSOR(0, INPUT_TOPLEFT_Y);
 	cout << "Enter a valid command:\t     ";
-	MOVE_CURSOR(0, 4);
+	MOVE_CURSOR(0, INPUT_TOPLEFT_Y);
 	cout << "Enter a valid command:\t"; //reprint to get curser back to being next to semicolon
-	MOVE_CURSOR(0, 5);
+	MOVE_CURSOR(0, INPUT_TOPLEFT_Y + 1);
 	cout << "Previous command: " << input[0] << input[1]; //reprint to get curser back to being next to semicolon
 	console.Signal();
 
@@ -390,6 +401,10 @@ void animationElevatorControl(int* status) {
 					cout << "[|   |]";
 					console.Signal();
 					i++;
+
+					//Play sound
+					PlaySound(TEXT("..\\sounds\\bell1.wav"), NULL, SND_ASYNC);
+
 				}
 			}
 			
@@ -439,23 +454,32 @@ void animationBuildShafts(void) {
 }
 
 void animationUpdateStatusBar(int* status) {
-	console.Wait();
-	if (E1Status[0] == 1) { // 12104
-		MOVE_CURSOR(0, 2);
 
-		switch (E1Status[1]) {
+	console.Wait();
+
+	//Set row to write status
+	if (status[0] == 1) { //E1
+		MOVE_CURSOR(0, status[0]);
+		cout << "E1		";
+	}
+	if (status[0] == 2) { //E2
+		MOVE_CURSOR(0, status[0]); 
+		cout << "E2		";
+	}
+
+		switch (status[1]) {
 		case 2:
-			cout << "Up			";
+			cout << "Up		";
 			break;
 		case 1:
-			cout << "Down			";
+			cout << "Down		";
 			break;
 		case 0:
-			cout << "Not moving		";
+			cout << "Not moving	";
 			break;
 		}
 
-		switch (E1Status[2]) {
+		switch (status[2]) {
 		case 0:
 			cout << "Out of service	";
 			break;
@@ -469,8 +493,7 @@ void animationUpdateStatusBar(int* status) {
 			break;
 		}
 		
-
-		switch (E1Status[3]) {
+		switch (status[3]) {
 		case 0:
 			cout << "Closed			";
 			break;
@@ -479,8 +502,8 @@ void animationUpdateStatusBar(int* status) {
 			break;
 		}
 
-		cout << E1Status[4];
-	}
+		cout << status[4];
+	
 
 	console.Signal();
 }
