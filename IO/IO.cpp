@@ -20,6 +20,7 @@ struct IODispatch {
 };
 
 int E1Status[5] = {};
+int E2Status[5] = {};
 int passengerEnable = 0;
 
 //Pipeline
@@ -42,8 +43,10 @@ void animationBuildFramework(void);
 
 UINT __stdcall UpdateDisplay(void* args) {
 
-	int previousPacket[5] = {0,0,0,0,0};
-	int flag = 0;
+	int previousE1Packet[5] = {0,0,0,0,0};
+	int previousE2Packet[5] = {0,0,0,0,0};
+	int flagE1 = 0;
+	int flagE2 = 0;
 
 	//create layout for animation
 	animationBuildFramework();
@@ -56,17 +59,26 @@ UINT __stdcall UpdateDisplay(void* args) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;
 		}
+		int E2Update = E2Monitor.getInfoIO(); // wait for data?
+		for (int i = 4; i >= 0; i--) {
+			E2Status[i] = E2Update % 10;
+			E2Update /= 10;
+		}
 
 		//check for change in packet
 		for (int i = 4; i >= 0; i--) {
-			if (previousPacket[i] != E1Status[i]) {
-				flag = 1;
-				//break;
+			if (previousE1Packet[i] != E1Status[i]) {
+				flagE1 = 1;
+			}
+		}
+		for (int i = 4; i >= 0; i--) {
+			if (previousE2Packet[i] != E2Status[i]) {
+				flagE2 = 1;
 			}
 		}
 
 		//execute animation if new packet
-		if (flag == 1) {
+		if (flagE1 == 1) {
 
 			//Update Elevator status bar in realtime
 			animationUpdateStatusBar(E1Status);
@@ -80,16 +92,40 @@ UINT __stdcall UpdateDisplay(void* args) {
 			}
 
 			//reset flag
-			flag = 0;
+			flagE1 = 0;
 
 			//reset cursor to data entry position
 			MOVE_CURSOR(24, 4); 
 
 		}
 
+		if (flagE2 == 1) {
+
+			//Update Elevator status bar in realtime
+			animationUpdateStatusBar(E2Status);
+
+			//Animate elevator in relatime
+			animationElevator(E2Status);
+
+			//Terminate thread if E stop pressed
+			if (E2Status[2] == 9) {
+				break;
+			}
+
+			//reset flag
+			flagE2 = 0;
+
+			//reset cursor to data entry position
+			MOVE_CURSOR(24, 4);
+
+		}
+
 		//Copy current packet into previous packet for comparison next loop
 		for (int i = 4; i >= 0; i--) {
-			previousPacket[i] = E1Status[i];
+			previousE1Packet[i] = E1Status[i];
+		}
+		for (int i = 4; i >= 0; i--) {
+			previousE2Packet[i] = E2Status[i];
 		}
 		
 	}
