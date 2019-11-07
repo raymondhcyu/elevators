@@ -112,7 +112,7 @@ UINT __stdcall Thread1(void* args) {
 			}
 
 			someArray[i] = E1MessageFromPipe;
-			
+
 			// Debugging
 			{cout << __LINE__ << "\t";
 			for (int j = 0; j < 99; j++) {
@@ -130,7 +130,7 @@ UINT __stdcall Thread1(void* args) {
 		}
 	}
 	return 0;
-} 
+}
 
 UINT __stdcall Thread2(void* args) {
 	int i = 0;
@@ -160,6 +160,8 @@ UINT __stdcall Thread2(void* args) {
 			startFlag = 1;
 		}
 
+		E1MessageResponse = E1Monitor.getInfoDispatch();
+
 		if (emergencyStopFlag)
 			E1MessagePrevious = 11900; // [2] = 9 as termination
 		else if (someArray[i] != 0) {
@@ -171,8 +173,6 @@ UINT __stdcall Thread2(void* args) {
 			arrayStartFlag = 1;
 		}
 		// Else previous message = previous message
-
-		E1MessageResponse = E1Monitor.getInfoDispatch();
 
 		{console.Wait();
 		cout << endl;

@@ -6,7 +6,7 @@ CRendezvous r1("CreationRendezvous", 4); // sync creation of 4x processes
 UINT mailboxMessage;
 CMailbox dispatchMailbox;
 
-int E2Current[5] = { 1, 0, 1, 1, 0 }; // current status of E2 before commands
+int E2Current[5] = { 2, 0, 1, 1, 0 }; // current status of E2 before commands
 int E2Command[5] = {};
 
 int E2StartFlag = 0; // only once start condition

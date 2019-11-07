@@ -45,7 +45,7 @@ int TheMonitorOne::getInfoIO(void) {
 	// Convert IO int array message into single int
 	UINT IOmessage = 1; // 1 for elevator1
 
-	ps1->Wait(); 
+	ps1->Wait();
 	IOmessage *= 10; // 10
 	IOmessage += dataPtr->direction; // ex 11
 	IOmessage *= 10; // ex 120
