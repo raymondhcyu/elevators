@@ -20,9 +20,10 @@ Debugging tip: "Sprinkle print lines"
 #define MAX_PASSENGERS 20
 
 #define ANIMATION_TOPLEFT_X 10
-#define ANIMATION_TOPLEFT_Y 10
+#define ANIMATION_TOPLEFT_Y 11
 #define E1_TOPLEFT_X 11
 #define E2_TOPLEFT_X 19
+#define INPUT_TOPLEFT_Y 5
 
 #define ELEVATOR_DOOR_DELAY 200
 
@@ -34,6 +35,8 @@ Debugging tip: "Sprinkle print lines"
 #define PURPLE 5
 #define WHITE 7 
 #define GRAY 8
+
+#define FILEPATH_BELL "..\\sounds\\bell1.wav"
 
 #include "rt.h"
 
