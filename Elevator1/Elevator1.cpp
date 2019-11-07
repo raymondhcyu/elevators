@@ -10,6 +10,7 @@ int E1Current[5] = {1, 0, 1, 1, 0}; // current status of E1 before commands
 int E1Command[5] = {};
 
 int E1StartFlag = 0; // only once start condition
+int E1StopFlag = 0; // only once end condition
 
 int main() {
 	// Rendezvous to start
@@ -102,6 +103,11 @@ int main() {
 					E1Current[3] = 1;
 					E1Monitor.setInfo(E1Current);
 				}
+				else if (E1Command[2] == 9) { // termination condition
+					E1Current[2] = 9;
+					E1Monitor.setInfo(E1Current);
+					break;
+				}
 				//// Open doors
 				//else if (E1Current[3] == 0) {
 				//	cout << __LINE__ << endl;
@@ -129,6 +135,8 @@ int main() {
 
 		}
 	}
+
+	cout << "Elevator 1 terminated..." << endl;
 
 	getchar();
 	return 0;

@@ -52,6 +52,15 @@ UINT __stdcall Thread1(void* args) {
 				messagePacket[2] = 1;
 				messagePacket[3] = 0;
 				messagePacket[4] = 0; // convert character to int
+
+				//for (int j = 0; j < 5; j++) {
+				//	E1MessageFromPipe *= 10;
+				//	E1MessageFromPipe += messagePacket[j];
+				//}
+
+				//someArray[i] = E1MessageFromPipe;
+
+				//break; // stop while loop
 			}
 			// 'u' or 'd' command outside
 			else if ((pipeIOData.inputs[0] == 'u') || (pipeIOData.inputs[0] == 'd')) {
@@ -146,7 +155,7 @@ UINT __stdcall Thread2(void* args) {
 		}
 
 		if (emergencyStopFlag)
-			E1MessagePrevious = 11900; // [2] = 9 as emergency stop
+			E1MessagePrevious = 11900; // [2] = 9 as termination
 		else if (someArray[i] != 0) {
 			E1MessagePrevious = someArray[i];
 			arrayIncrementFlag = 0;
@@ -165,6 +174,16 @@ UINT __stdcall Thread2(void* args) {
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
+		//if (E1MessageResponse == 11900) {
+		//	cout << __LINE__ << endl;
+
+		//	E1MailConsumer.Wait(); // produce message for mailbox
+		//	E1Message = 11900;
+		//	E1MailProducer.Signal();
+		//	cout << __LINE__ << endl;
+
+		//	break; // exit while loop
+		//}
 		// Check if elevator done; -2000 checks up motion, +10 checks door
 		// E.g. command - 1990 = elevator arrived on target floor stopped, and doors open
 		if (((E1MessagePrevious - 1990) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
@@ -252,12 +271,16 @@ int main(void) {
 	while (1) {
 		// Send mail to E1 through p1
 		E1MailProducer.Wait();
+		//if (E1Message == 11900) // termination command
+		//	break;
 		if (E1Message != 0) {
 			p1.Post(E1Message);
 		}
 		E1Message = 0; // reset message after sent
 		E1MailConsumer.Signal();
 	}
+
+	cout << "Dispatcher complete..." << endl;
 
 	t1.WaitForThread();
 	t2.WaitForThread();
