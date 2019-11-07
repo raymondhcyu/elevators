@@ -174,6 +174,7 @@ UINT __stdcall Thread2(void* args) {
 		cout << "E1 Message previous: " << E1MessagePrevious << endl;
 		console.Signal(); }
 
+		// Check if termination message is sent by elevator 1
 		if (E1MessageResponse == 10910) {
 			cout << __LINE__ << endl;
 
@@ -205,18 +206,6 @@ UINT __stdcall Thread2(void* args) {
 			//console.Signal();
 			E1MailConsumer.Wait(); // produce message for mailbox
 			E1Message = E1MessagePrevious - 990;
-			E1MailProducer.Signal();
-			arrayIncrementFlag = 1;
-		}
-		// Check if elevator done from inside; +10 checks door
-		// E.g. command + 10 = elevator arrived on target floor stopped, and doors open
-		else if (((E1MessagePrevious + 10) == E1MessageResponse) && (arrayIncrementFlag == 0)) {
-			i++;
-			//console.Wait();
-			//cout << "Value of i is " << i << endl;
-			//console.Signal();
-			E1MailConsumer.Wait(); // produce message for mailbox
-			E1Message = E1MessagePrevious + 10;
 			E1MailProducer.Signal();
 			arrayIncrementFlag = 1;
 		}
