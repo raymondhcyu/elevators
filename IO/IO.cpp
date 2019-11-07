@@ -233,7 +233,6 @@ void animationClearPrevious(int* status) {
 }
 
 void animationElevatorControl(int* status) {
-	console.Wait();
 
 	int i = 0; 
 
@@ -247,43 +246,52 @@ void animationElevatorControl(int* status) {
 
 		if (status[2] == 0) { //if out of service
 			SetConsoleTextAttribute(hConsole, RED);
+			console.Wait();
 			cout << "[  X  ]";
+			console.Signal();
 			SetConsoleTextAttribute(hConsole, WHITE);
 			i = 2;
 		}
 		if (status[2] == 1) { //if in service: display door open or closed
 
-			if (status[3] == 0) {
-				if (i == 0) {
+			if (status[3] == 0) { //door closed
+				if (i == 0 && status[1] == 0) { //checks also if elevator stopped
+
 					SetConsoleTextAttribute(hConsole, YELLOW);
-					cout << "[ | | ]";
-					Sleep(500);
+					console.Wait();
+					cout << "[ | | ]" << i;
+					console.Signal();
+					Sleep(ELEVATOR_DOOR_DELAY);
 					i++;
 				}
 				else {
 					SetConsoleTextAttribute(hConsole, GREEN);
+					console.Wait();
 					cout << "[  |  ]";
+					console.Signal();
 					i++;
 				}
 			}
-			if (status[3] == 1) {
+			if (status[3] == 1) { //door open
 				SetConsoleTextAttribute(hConsole, YELLOW);
-				if (i == 0) {
+				if (i == 0 && status[1] == 0) {
 					
+					console.Wait();
 					cout << "[ | | ]";
-					Sleep(500);
+					console.Signal();
+					Sleep(ELEVATOR_DOOR_DELAY);
 					i++;
 				}
 				else {
+					console.Wait();
 					cout << "[|   |]";
+					console.Signal();
 					i++;
 				}
 			}
 			SetConsoleTextAttribute(hConsole, WHITE);
 		}
 	}
-
-	console.Signal();
 }
 
 void animationCurrentFloor(int* status) {

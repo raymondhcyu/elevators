@@ -23,6 +23,8 @@ Debugging tip: "Sprinkle print lines"
 #define E1_TOPLEFT_X 11
 #define E2_TOPLEFT_X 19
 
+#define ELEVATOR_DOOR_DELAY 200
+
 #define BLACK 0
 #define RED 4
 #define YELLOW 6
