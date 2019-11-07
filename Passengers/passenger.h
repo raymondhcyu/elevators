@@ -1,6 +1,3 @@
-
-
-
 #ifndef __passenger__
 #define __passenger__
 
@@ -21,11 +18,15 @@ private:
 	int main(void);
 
 
-
-
 public:
 
+	int getpStatus(void);
+	int getpElevator(void);
+	int getpFloor(void);
 
+	int setpStatus(int status);
+	int setpElevator(int elevator);
+	int setpFloor(int floor);
 
 	//STRUCTORS
 	passenger(int id);
