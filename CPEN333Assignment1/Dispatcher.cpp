@@ -130,7 +130,7 @@ UINT __stdcall Thread1(void* args) {
 		}
 	}
 	return 0;
-}
+} 
 
 UINT __stdcall Thread2(void* args) {
 	int i = 0;
