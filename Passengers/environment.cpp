@@ -16,7 +16,6 @@ int main(void) {
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //to change console colors etc 
 
-	CSemaphore raceStart("Race Start", 0, 1);
 	CSemaphore monitor("Monitor", 1, 1);
 
 	//READY
@@ -55,6 +54,8 @@ int main(void) {
 
 			//SET Passenger to enabled
 			myPs[index]->setpStatus(1);
+
+			myPs[index]->Resume();
 
 			cout << "Passenger " << myPs[index]->getpNum() << " on floor " << myPs[index]->getpFloorCurrent() << " requesting floor " << myPs[index]->getpFloorDesired() << endl;
 

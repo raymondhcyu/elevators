@@ -244,9 +244,11 @@ int getUserInput(char* input) {
 	cout << "Previous command: " << input[0] << input[1]; //reprint to get curser back to being next to semicolon
 	console.Signal();
 
+	
+
 	input[0] = input[1] = ' '; //clear old inputs
 
-	while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e') && (input[0] != '1') && (input[0] != '2') && (input[0] != '-') && (input[0] != '+')) {
+	while ((input[0] != 'u') && (input[0] != 'd') && (input[0] != 'e') && (input[0] != '1') && (input[0] != '2') /*&& (input[0] != '-') && (input[0] != '+')*/) {
 		input[0] = _getch();
 	}
 	console.Wait();
@@ -282,14 +284,14 @@ int getUserInput(char* input) {
 		console.Signal();
 	}
 
-	if ((input[0] == '+') || (input[0] == '-')) {
-		while ((input[1] != '2') && (input[1] != '1')) {
-			input[1] = _getch();
-		}
-		console.Wait();
-		cout << input[1];
-		console.Signal();
-	}
+	//if ((input[0] == '+') || (input[0] == '-')) {
+	//	while ((input[1] != '2') && (input[1] != '1')) {
+	//		input[1] = _getch();
+	//	}
+	//	console.Wait();
+	//	cout << input[1];
+	//	console.Signal();
+	//}
 
 	if (input[0] == 'e') {
 		while (input[1] != 'e') {
@@ -311,6 +313,9 @@ int getUserInput(char* input) {
 	else {
 		return 0;
 	}
+
+	MOVE_CURSOR(24, INPUT_TOPLEFT_Y);
+
 }
 
 void animationElevator(int* status) {
