@@ -1,3 +1,10 @@
+/*
+7 November 2019
+
+Raymond Yu 11298149
+Jason LeBlanc 45015154
+*/
+
 #include "..\rt.h"
 #include "..\resources.h"
 #include "passenger.h"
