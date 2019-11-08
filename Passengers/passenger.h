@@ -11,7 +11,8 @@ private:
 	int pNum; //passenger ID number
 	int pStatus = 0; // 0 - Deactivated, 1 Activated
 	int pElevator = 0; // 1 - Elevator 1, 2 - Elevator 2
-	int pFloor = 0; // Start on floor 0 always
+	int pFloorCurr = 0; // Start on floor 0 always
+	int pFloorDes = 0;
 
 
 	//MAIN
@@ -19,14 +20,18 @@ private:
 
 
 public:
-
+	
+	
+	int getpNum(void);
 	int getpStatus(void);
 	int getpElevator(void);
-	int getpFloor(void);
+	int getpFloorCurrent(void);
+	int getpFloorDesired(void);
 
-	int setpStatus(int status);
-	int setpElevator(int elevator);
-	int setpFloor(int floor);
+	void setpStatus(int status);
+	void setpElevator(int elevator);
+	void setpFloorCurrent(int floor);
+	void setpFloorDesired(int floor);
 
 	//STRUCTORS
 	passenger(int id);
