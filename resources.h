@@ -1,4 +1,11 @@
 /*
+7 November 2019
+
+Raymond Yu 11298149
+Jason LeBlanc 45015154
+*/
+
+/*
 Message packet format to be passed to/from elevators
 _ _ _ _ _
 0 1 2 3 4
