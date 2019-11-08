@@ -128,7 +128,7 @@ UINT __stdcall Thread1(void* args) {
 
 			// Debugging
 			console.Wait();
-			{cout << __LINE__ << " RECEIVED THIS IN ARRAY \t";
+			{cout << __LINE__ << "\t";
 			for (int j = 0; j < 99; j++) {
 				if (someArray[j] != 0)
 					cout << someArray[j];
@@ -157,18 +157,6 @@ UINT __stdcall Thread2(void* args) {
 			cout << __LINE__ << endl;
 
 			E1MailConsumer.Wait(); // produce message for mailbox
-			//// 10110
-			//messagePacket[0] = 1;
-			//messagePacket[1] = 0;
-			//messagePacket[2] = 1;
-			//messagePacket[3] = 1;
-			//messagePacket[4] = 0;
-
-			//// Convert message packet int array to int
-			//for (int j = 0; j < 5; j++) {
-			//	E1Message *= 10;
-			//	E1Message += messagePacket[j];
-			//}
 
 			E1Message = 10110;
 			E2Message = 20110;
