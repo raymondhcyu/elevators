@@ -30,8 +30,17 @@ int main() {
 
 			cout << __LINE__ << endl;
 
-			// If not a stop command (later) and if difference greater than 0 move up
-			if (E1Command[4] - E1Current[4] > 0) {
+			// Check if command to take out of service
+			if (E1Command[2] == 0) {
+				// Stop if moving
+				if ((E1Current[1] == 2) || (E1Current[1] == 1)) {
+					Sleep(100);
+					E1Current[1] = 0; // stop elevator
+					E1Monitor.setInfo(E1Current);
+				}
+			}
+			// Check if difference greater than 0 move up
+			else if (E1Command[4] - E1Current[4] > 0) {
 				E1StartFlag = 1; // not starting anymore since command sent
 				cout << __LINE__ << endl;
 

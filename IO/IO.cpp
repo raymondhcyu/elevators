@@ -58,7 +58,7 @@ UINT __stdcall UpdateDisplay(void* args) {
 
 		// Convert monitor update int to int array for processing
 		int E1Update = E1Monitor.getInfoIO(); // wait for data?
-		int E2Update = 0; // E2Monitor.getInfoIO(); // wait for data? //ERROR HERE - stuck waiting for E2 Data...
+		int E2Update = E2Monitor.getInfoIO(); // wait for data? //ERROR HERE - stuck waiting for E2 Data...
 		for (int i = 4; i >= 0; i--) {
 			E1Status[i] = E1Update % 10;
 			E1Update /= 10;

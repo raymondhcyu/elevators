@@ -88,13 +88,26 @@ UINT __stdcall Thread1(void* args) {
 				messagePacket[3] = 0;
 				messagePacket[4] = atoi(&pipeIOData.inputs[1]); // convert character to int
 			}
-			// '-' leading command take out of service
-			else if (pipeIOData.inputs[0] == '-') {
-				// open doors? change service status
-			}
-			// '+' leading command bring back into service
-			else if (pipeIOData.inputs[0] == '+') {
-				// open doors? change service status
+			// '-' or '+' leading command take out of service
+			else if ((pipeIOData.inputs[0] == '-') || (pipeIOData.inputs[0] == '+')) {
+				//std::unordered_map<char, int> statusReference{ {'-', 0}, {'+', 1}, {'1', 1}, {'2', 2} }; // GCOM magic x2
+
+				//messagePacket[0] = statusReference[pipeIOData.inputs[1]];
+				//console.Wait();
+				//cout << "Zeroth message index is: " << messagePacket[0] << endl;
+				//console.Signal();
+				//messagePacket[1] = 0;
+				//cout << "First message index is: " << messagePacket[1] << endl;
+
+				//messagePacket[2] = statusReference[pipeIOData.inputs[0]];
+				//cout << "Second message index is: " << messagePacket[2] << endl;
+
+				//messagePacket[3] = 0;
+				//cout << "Third message index is: " << messagePacket[3] << endl;
+
+				//messagePacket[4] = 0;
+				//cout << "Fourth message index is: " << messagePacket[4] << endl;
+
 			}
 			//{// Debugging
 			//	console.Wait();
@@ -114,12 +127,14 @@ UINT __stdcall Thread1(void* args) {
 			someArray[i] = E1MessageFromPipe;
 
 			// Debugging
-			{cout << __LINE__ << "\t";
+			console.Wait();
+			{cout << __LINE__ << " RECEIVED THIS IN ARRAY \t";
 			for (int j = 0; j < 99; j++) {
 				if (someArray[j] != 0)
 					cout << someArray[j];
 			}
 			cout << endl; }
+			console.Signal();
 			i++;
 
 			console.Wait();
@@ -171,7 +186,6 @@ UINT __stdcall Thread2(void* args) {
 			E2MessagePrevious = 21900;
 		}
 		else if (someArray[i] != 0) {
-
 			E1MessagePrevious = someArray[i]; // before someArray gets modified
 
 			int theMessagePrevious[5] = {};
